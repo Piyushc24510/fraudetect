@@ -7,6 +7,41 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
+        :root{
+            --bg:#0a0a0a;--card:#161b22;--border:#333333;
+            --accent:#00ff99;--accent2:#00cc7a;--text:#ffffff;
+            --muted:#888888;--fake:#ff5555;--genuine:#00ff99;
+            --sidebar-w:260px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;transition:transform 0.3s;}
+        
+        .logo-area .icon{font-size:38px;color:var(--accent);}
+        .logo-area h3{font-size:16px;color:var(--accent);margin-top:8px;letter-spacing:1px;}
+        .logo-area small{font-size:11px;color:var(--muted);}
+        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
+        .nav-link i{width:17px;text-align:center;}
+        .nav-link:hover{background:rgba(0,255,153,0.09);color:var(--accent);}
+        .nav-link.active{background:rgba(0,255,153,0.14);color:var(--accent);font-weight:600;}
+        .divider{height:1px;background:var(--border);margin:10px 0;}
+        .bottom-area{margin-top:auto;}
+        .user-card{background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.18);border-radius:10px;padding:13px;margin-bottom:10px;}
+        .user-card .uname{font-size:13px;font-weight:600;}
+        .user-card .uname i{color:var(--accent);margin-right:6px;}
+        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:var(--accent);margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
+        .logout-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
+        .logout-btn:hover{background:rgba(255,85,85,0.1);}
+        .main{position:relative;z-index:1;margin-left:var(--sidebar-w);padding:32px 28px;min-height:100vh;}
+        .page-head{margin-bottom:26px;}
+        .page-head h1{font-size:26px;font-weight:700;}
+        .page-head p{color:var(--muted);font-size:14px;margin-top:5px;}
+        .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:190;}
+        .overlay.show{display:block;}
+        @media(max-width:860px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main{margin-left:0;padding:20px 16px;padding-top:60px;}.mob-menu{display:flex!important;}}
+        @media(max-width:480px){.main{padding:14px;padding-top:60px;}}
+        /* ── dashboard specific ── */
         * {
             margin: 0;
             padding: 0;
@@ -15,8 +50,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-body);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
             overflow-x: hidden;
         }
 
@@ -45,7 +80,7 @@
             height: 100vh;
             background: var(--bg-sidebar);
             padding: 30px 20px;
-            box-shadow: 4px 0 15px var(--shadow-sidebar);
+            box-shadow: 4px 0 15px rgba(0,255,153,0.1);
             z-index: 1000;
             overflow-y: auto;
             transition: transform 0.3s ease;
@@ -60,7 +95,7 @@
 
         .user-info {
             text-align: center;
-            color: var(--text-secondary);
+            color: var(--muted);
             font-size: 14px;
             margin-bottom: 30px;
             padding-bottom: 20px;
@@ -74,7 +109,7 @@
             background: transparent;
             border: none;
             border-radius: 8px;
-            color: var(--text-primary);
+            color: var(--text);
             font-size: 16px;
             text-align: left;
             cursor: pointer;
@@ -94,7 +129,7 @@
         }
 
         .side-btn.active {
-            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
             color: #000;
             font-weight: bold;
         }
@@ -110,14 +145,14 @@
             color: #ff4d4d;
             text-decoration: none;
             font-size: 16px;
-            border-top: 1px solid var(--border-sidebar);
+            border-top: 1px solid var(--border);
         }
 
         .main {
-            margin-left: 260px;
+            margin-left: var(--sidebar-w);
             padding: 40px;
             min-height: 100vh;
-            background: var(--bg-main);
+            background: var(--bg);
             transition: margin-left 0.3s ease, background 0.3s ease;
         }
 
@@ -143,7 +178,7 @@
 
         .export-btn {
             padding: 10px 20px;
-            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
             border: none;
             border-radius: 8px;
             color: #000;
@@ -173,7 +208,7 @@
             padding: 25px;
             border-radius: 15px;
             text-align: center;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             transition: transform 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -194,7 +229,7 @@
         }
 
         .stat-card h3 {
-            color: var(--text-secondary);
+            color: var(--muted);
             font-size: 14px;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -228,7 +263,7 @@
             background: var(--bg-panel);
             padding: 25px;
             border-radius: 15px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
         }
 
         .panel h3 {
@@ -350,12 +385,12 @@
             padding: 12px;
             text-align: left;
             color: var(--accent);
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 2px solid var(--border);
         }
 
         .user-table td {
             padding: 12px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border);
         }
 
         .user-table tr:hover {
@@ -409,7 +444,7 @@
 
         .mini-stat .label {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: var(--muted);
         }
 
         /* Auto-refresh indicator */
@@ -564,33 +599,7 @@
 
 
         /* ════════════════ THEME VARIABLES ════════════════ */
-        :root {
-            --bg-body:        #0a0a0a;
-            --bg-main:        linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%);
-            --bg-sidebar:     linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%);
-            --bg-panel:       linear-gradient(135deg,#1e1e1e 0%,#2a2a2a 100%);
-            --bg-card:        linear-gradient(135deg,#1e1e1e 0%,#2a2a2a 100%);
-            --bg-header:      linear-gradient(135deg,#1e1e1e 0%,#2a2a2a 100%);
-            --bg-row:         #1a1a1a;
-            --bg-mini:        #1a1a1a;
-            --bg-wc:          #1a1a1a;
-            --bg-activity:    #1a1a1a;
-            --text-primary:   #ffffff;
-            --text-secondary: #888888;
-            --text-muted:     #666666;
-            --border-color:   #333333;
-            --border-sidebar: #404040;
-            --accent:         #00ff99;
-            --accent-hover:   #00cc7a;
-            --shadow-sidebar: rgba(0,255,153,0.1);
-            --chart-grid:     #333333;
-            --chart-tick:     #888888;
-            --chart-legend:   #ffffff;
-            --th-bg:          #1a1a1a;
-            --skeleton-a:     #2a2a2a;
-            --skeleton-b:     #3a3a3a;
-            --scrollbar-track:#1a1a1a;
-        }
+        
         body,
         .sidebar,.main,.header,.stat-card,.panel,
         .mini-stat,.activity-item,.user-table th,
@@ -606,7 +615,7 @@
             transition:all 0.3s ease;width:100%;user-select:none;
         }
         .theme-pill:hover { background:rgba(0,255,153,0.12); border-color:var(--accent); transform:scale(1.02); }
-        .theme-pill .pill-labels { display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-primary);letter-spacing:0.4px; }
+        .theme-pill .pill-labels { display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);letter-spacing:0.4px; }
         .theme-pill .pill-labels i { font-size:14px;color:var(--accent); }
         .theme-pill .pill-track { position:relative;width:42px;height:22px;background:var(--track-bg,#333);border-radius:11px;flex-shrink:0;transition:background 0.3s ease; }
         .theme-pill .pill-thumb { position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--accent);transition:transform 0.3s ease,background 0.3s ease;box-shadow:0 0 8px rgba(0,255,153,0.6); }
@@ -630,10 +639,10 @@
         }
         /* ══════ NEW SIDEBAR ══════ */
         .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:1200;background:#00ff99;color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
-        .overlay-new{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1100;}
-        .overlay-new.show{display:block;}
-        .sidebar-new{position:fixed;left:0;top:0;width:260px;height:100vh;background:#161b22;border-right:1px solid #30363d;padding:28px 18px;z-index:1150;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
-        .logo-area{text-align:center;margin-bottom:28px;}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1100;}
+        .overlay.show{display:block;}
+        .sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:#161b22;border-right:1px solid #30363d;padding:28px 18px;z-index:1150;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+        
         .logo-area .icon{font-size:38px;color:#00ff99;}
         .logo-area h3{font-size:16px;color:#00ff99;margin-top:8px;letter-spacing:1px;}
         .logo-area small{font-size:11px;color:#8b949e;}
@@ -661,12 +670,12 @@
         .role-pill-new{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:#00ff99;margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
         .logout-btn-new{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
         .logout-btn-new:hover{background:rgba(255,85,85,0.1);}
-        @media(max-width:860px){.sidebar-new{transform:translateX(-100%);transition:transform 0.3s;}.sidebar-new.open{transform:translateX(0);}.mob-menu{display:flex!important;}.main{position:relative;z-index:1;margin-left:0!important;padding-top:60px!important;}}
+        @media(max-width:860px){.sidebar{transform:translateX(-100%);transition:transform 0.3s;}.sidebar.open{transform:translateX(0);}.mob-menu{display:flex!important;}.main{position:relative;z-index:1;margin-left:0!important;padding-top:60px!important;}}
 
         /* ── Hourly Activity Heatmap ── */
         .heatmap-panel {
             background: var(--bg-panel);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
@@ -761,10 +770,10 @@
     </style>
 </head>
 <body>
-    <button class="mob-menu" id="menuBtn" onclick="toggleSidebarNew()"><i class="fa fa-bars"></i></button>
-    <div class="overlay-new" id="overlayNew" onclick="toggleSidebarNew()"></div>
+    <button class="mob-menu" id="menuBtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+    <div class="overlay" id="overlayNew" onclick="toggleSidebar()"></div>
 
-    <aside class="sidebar-new" id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="logo-area">
             <i class="fa fa-shield-alt icon"></i>
             <h3>FraudDetect</h3>
@@ -1249,7 +1258,7 @@
     </script>
 
     <script>
-function toggleSidebarNew(){
+function toggleSidebar(){
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlayNew').classList.toggle('show');
 }
