@@ -1,316 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
-        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-body: #0a0a0a;
-            --bg-card: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            --text-primary: #ffffff;
-            --text-secondary: #888888;
-            --accent: #00ff99;
-            --accent-hover: #00cc7a;
-            --border-color: #333333;
+        :root{
+            --bg:#060910;--card:rgba(14,20,32,0.85);--border:rgba(0,255,180,0.12);
+            --accent:#00ffb3;--accent2:#00cc8a;--accent-glow:rgba(0,255,179,0.25);
+            --text:#e2edf7;--muted:#5a7a8a;--fake:#ff4466;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-body); position: relative;
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .register-container {
-            position: relative; z-index: 1;
-            width: 100%;
-            max-width: 450px;
-            background: var(--bg-card);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 0 30px rgba(0, 255, 153, 0.15);
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .logo i {
-            font-size: 48px;
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-        h2 {
-            text-align: center;
-            color: var(--accent);
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-        .subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        .alert {
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .alert.error {
-            background: rgba(255, 77, 77, 0.15);
-            border: 1px solid rgba(255, 77, 77, 0.4);
-            color: #ff6b6b;
-        }
-        .form-group {
-            margin-bottom: 18px;
-        }
-        .form-group label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 13px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .input-wrapper {
-            position: relative;
-        }
-        .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent);
-            font-size: 16px;
-        }
-        input {
-            width: 100%;
-            padding: 14px 14px 14px 45px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(0, 255, 153, 0.2);
-        }
-        input::placeholder { color: #555; }
-        .hint {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 255, 153, 0.4);
-        }
-        button i { margin-right: 8px; }
-        .links {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        .links a {
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-        .links a:hover { color: var(--accent-hover); }
-        .terms {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        @media (max-width: 480px) {
-            .register-container {
-            position: relative; z-index: 1; padding: 30px 24px; }
-            h2 { font-size: 24px; }
-            .logo i { font-size: 40px; }
-            input { font-size: 16px; }
-            .form-group { margin-bottom: 16px; }
-        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        #three-canvas{position:fixed;inset:0;z-index:0;}
+        body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;min-height:100vh;overflow-x:hidden;padding:20px;}
+        body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px);pointer-events:none;}
+
+        .register-wrapper{position:relative;z-index:10;width:100%;max-width:460px;}
+        .register-container{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px 40px 32px;backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(0,255,179,0.04),0 25px 80px rgba(0,0,0,0.7),0 0 60px rgba(0,255,179,0.05);position:relative;animation:cardIn 0.8s cubic-bezier(0.22,1,0.36,1) both;}
+        @keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+        .corner{position:absolute;width:16px;height:16px;border-color:rgba(0,255,179,0.4);border-style:solid;}
+        .corner.tl{top:-1px;left:-1px;border-width:2px 0 0 2px;border-radius:4px 0 0 0;}
+        .corner.tr{top:-1px;right:-1px;border-width:2px 2px 0 0;border-radius:0 4px 0 0;}
+        .corner.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px;border-radius:0 0 0 4px;}
+        .corner.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0;border-radius:0 0 4px 0;}
+
+        .logo{text-align:center;margin-bottom:24px;}
+        .logo-3d{width:64px;height:64px;margin:0 auto 14px;perspective:400px;cursor:pointer;}
+        .logo-cube{width:100%;height:100%;transform-style:preserve-3d;animation:rotateCube 8s linear infinite;position:relative;}
+        .logo-cube .face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid rgba(0,255,179,0.3);background:rgba(0,255,179,0.04);}
+        .logo-cube .front{transform:translateZ(32px);}.logo-cube .back{transform:rotateY(180deg) translateZ(32px);}.logo-cube .left{transform:rotateY(-90deg) translateZ(32px);}.logo-cube .right{transform:rotateY(90deg) translateZ(32px);}.logo-cube .top{transform:rotateX(90deg) translateZ(32px);}.logo-cube .bot{transform:rotateX(-90deg) translateZ(32px);}
+        @keyframes rotateCube{0%{transform:rotateX(0deg) rotateY(0deg);}100%{transform:rotateX(360deg) rotateY(360deg);}}
+        .logo h1{font-size:22px;color:var(--text);font-weight:800;text-transform:uppercase;letter-spacing:1px;}
+        .logo .subtitle{color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-family:'Space Mono',monospace;}
+
+        .status-bar{display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:22px;}
+        .status-dot{width:6px;height:6px;border-radius:50%;background:var(--purple,#7c3aed);animation:blink 2s infinite;}
+        @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+        .status-text{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(124,58,237,0.7);font-family:'Space Mono',monospace;}
+
+        .alert{padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:13px;display:flex;align-items:center;gap:10px;font-family:'Space Mono',monospace;}
+        .alert.error{background:rgba(255,68,102,0.08);border:1px solid rgba(255,68,102,0.3);color:#ff8090;}
+        .alert.success{background:rgba(0,255,179,0.07);border:1px solid rgba(0,255,179,0.25);color:var(--accent);}
+
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;}
+        .form-grid .form-group.full{grid-column:1 / -1;}
+        .form-group{margin-bottom:16px;}
+        .form-group label{display:block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-family:'Space Mono',monospace;}
+        .input-wrapper{position:relative;}
+        .input-wrapper .input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(0,255,179,0.4);font-size:13px;pointer-events:none;transition:color 0.3s;}
+        input[type="text"],input[type="password"]{width:100%;padding:12px 12px 12px 38px;background:rgba(0,255,179,0.02);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13.5px;font-family:'Space Mono',monospace;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;}
+        input[type="text"]:focus,input[type="password"]:focus{border-color:var(--accent);background:rgba(0,255,179,0.03);box-shadow:0 0 0 3px var(--accent-glow);}
+        input::placeholder{color:var(--muted);font-size:12.5px;}
+
+        /* Password strength */
+        .strength-bar{display:flex;gap:4px;margin-top:7px;}
+        .strength-segment{flex:1;height:3px;border-radius:2px;background:rgba(0,255,179,0.08);transition:background 0.4s;}
+
+        /* Requirements */
+        .requirements{margin-top:8px;padding:10px 12px;background:rgba(0,255,179,0.02);border:1px solid rgba(0,255,179,0.08);border-radius:8px;}
+        .req-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;margin:3px 0;transition:color 0.3s;font-family:'Space Mono',monospace;}
+        .req-item i{font-size:10px;width:12px;transition:color 0.3s;}
+        .req-item.valid{color:rgba(0,255,179,0.85);}
+        .req-item.valid i{color:var(--accent);}
+
+        /* Match indicator */
+        .match-indicator{font-size:11px;margin-top:5px;display:flex;align-items:center;gap:5px;min-height:16px;font-family:'Space Mono',monospace;}
+
+        /* Button */
+        .btn-register{width:100%;padding:14px;margin-top:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#000;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.3s;}
+        .btn-register::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transition:left 0.5s;}
+        .btn-register:hover::before{left:100%;}
+        .btn-register:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,255,179,0.4);}
+        .btn-register i{margin-right:8px;}
+
+        .links{text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+        .links a{color:rgba(0,255,179,0.6);text-decoration:none;font-size:13px;transition:color 0.2s;font-family:'Space Mono',monospace;}
+        .links a:hover{color:var(--accent);}
+
+        .terms{text-align:center;margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6;font-family:'Space Mono',monospace;}
+
+        @media(max-width:520px){.register-container{padding:28px 20px 24px;}.form-grid{grid-template-columns:1fr;}.form-grid .form-group.full{grid-column:1;}}
     </style>
 </head>
 <body>
+<canvas id="three-canvas"></canvas>
+
+<div class="register-wrapper">
     <div class="register-container">
+        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+
         <div class="logo">
-            <i class="fa fa-user-plus"></i>
-            <h2>Admin Registration</h2>
+            <div class="logo-3d"><div class="logo-cube"><div class="face front">🛡️</div><div class="face back">🔍</div><div class="face left">⚡</div><div class="face right">🤖</div><div class="face top">🎯</div><div class="face bot">✅</div></div></div>
+            <h1>Admin Registration</h1>
             <div class="subtitle">Create New Admin Account</div>
         </div>
-        {% if error %}
-        <div class="alert error">
-            <i class="fa fa-exclamation-circle"></i>
-            <span>{{ error }}</span>
+
+        <div class="status-bar">
+            <div class="status-dot"></div>
+            <span class="status-text">Secure Registration</span>
         </div>
-        {% endif %}
-        <form method="POST">
-            <div class="form-group">
-                <label><i class="fa fa-user"></i> Full Name</label>
-                <div class="input-wrapper">
-                    <i class="fa fa-user"></i>
-                    <input type="text" name="name" placeholder="Enter your full name" required>
+
+        {% if error %}<div class="alert error"><i class="fa fa-circle-exclamation"></i><span>{{ error }}</span></div>{% endif %}
+        {% if success %}<div class="alert success"><i class="fa fa-circle-check"></i><span>{{ success }}</span></div>{% endif %}
+
+        <form method="POST" id="register-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-wrapper"><input type="text" name="name" placeholder="Your full name" required><i class="fa fa-user input-icon"></i></div>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrapper"><input type="text" name="username" placeholder="Choose username" required><i class="fa fa-id-badge input-icon"></i></div>
+                </div>
+                <div class="form-group full">
+                    <label>Password</label>
+                    <div class="input-wrapper"><input type="password" name="password" id="password" placeholder="Create a strong password" required><i class="fa fa-lock input-icon"></i></div>
+                    <div class="strength-bar"><div class="strength-segment" id="s1"></div><div class="strength-segment" id="s2"></div><div class="strength-segment" id="s3"></div><div class="strength-segment" id="s4"></div></div>
+                    <div class="requirements" id="req-box">
+                        <div class="req-item" id="req-len"><i class="fa fa-circle-xmark"></i> At least 6 characters</div>
+                        <div class="req-item" id="req-upper"><i class="fa fa-circle-xmark"></i> One uppercase letter</div>
+                        <div class="req-item" id="req-num"><i class="fa fa-circle-xmark"></i> One number</div>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <label>Confirm Password</label>
+                    <div class="input-wrapper"><input type="password" name="confirm_password" id="confirm-password" placeholder="Re-enter your password" required><i class="fa fa-lock input-icon"></i></div>
+                    <div class="match-indicator" id="match-indicator"></div>
                 </div>
             </div>
-            <div class="form-group">
-                <label><i class="fa fa-id-card"></i> Username</label>
-                <div class="input-wrapper">
-                    <i class="fa fa-id-card"></i>
-                    <input type="text" name="username" placeholder="Choose a username" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label><i class="fa fa-lock"></i> Password</label>
-                <div class="input-wrapper">
-                    <i class="fa fa-lock"></i>
-                    <input type="password" name="password" placeholder="Create a password" required>
-                </div>
-                <div class="hint">
-                    <i class="fa fa-info-circle"></i>
-                    <span>Password must be at least 6 characters</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label><i class="fa fa-lock"></i> Confirm Password</label>
-                <div class="input-wrapper">
-                    <i class="fa fa-lock"></i>
-                    <input type="password" name="confirm_password" placeholder="Re-enter your password" required>
-                </div>
-            </div>
-            <button type="submit">
-                <i class="fa fa-check-circle"></i> Register Account
-            </button>
+            <button type="submit" class="btn-register"><i class="fa fa-circle-check"></i> Register Account</button>
         </form>
-        <div class="links">
-            <a href="/login"><i class="fa fa-sign-in-alt"></i> Already have an account? Login</a>
-        </div>
-        <div class="terms">
-            By registering, you agree to our Terms of Service and Privacy Policy
-        </div>
+
+        <div class="links"><a href="/login"><i class="fa fa-right-to-bracket"></i> &nbsp;Already have an account? Login</a></div>
+        <div class="terms">By registering, you agree to our Terms of Service and Privacy Policy</div>
     </div>
+</div>
 
-<!-- THREE.JS 3D NEURAL NETWORK BACKGROUND -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<canvas id="bg3d" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 <script>
-(function() {
-  var canvas = document.getElementById('bg3d');
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
+var pwdInput=document.getElementById('password'),confInput=document.getElementById('confirm-password'),matchEl=document.getElementById('match-indicator');
+var segments=[document.getElementById('s1'),document.getElementById('s2'),document.getElementById('s3'),document.getElementById('s4')];
+var colors=['#ff4466','#ffaa00','#ffcc00','#00ffb3'];
+function checkStrength(pwd){
+    var score=0;
+    if(pwd.length>=6)score++;if(pwd.length>=10)score++;if(/[A-Z]/.test(pwd))score++;if(/[0-9]/.test(pwd))score++;
+    segments.forEach(function(seg,i){seg.style.background=i<score?colors[score-1]:'rgba(0,255,179,0.08)';});
+    function setReq(el,valid){el.classList.toggle('valid',valid);el.querySelector('i').className=valid?'fa fa-circle-check':'fa fa-circle-xmark';}
+    setReq(document.getElementById('req-len'),pwd.length>=6);
+    setReq(document.getElementById('req-upper'),/[A-Z]/.test(pwd));
+    setReq(document.getElementById('req-num'),/[0-9]/.test(pwd));
+}
+function checkMatch(){
+    var pwd=pwdInput.value,conf=confInput.value;
+    if(!conf){matchEl.innerHTML='';return;}
+    if(pwd===conf){matchEl.innerHTML='<i class="fa fa-circle-check" style="color:var(--accent);font-size:11px;"></i> <span style="color:rgba(0,255,179,0.85);">Passwords match</span>';}
+    else{matchEl.innerHTML='<i class="fa fa-circle-xmark" style="color:var(--fake);font-size:11px;"></i> <span style="color:rgba(255,68,102,0.85);">Passwords do not match</span>';}
+}
+pwdInput.addEventListener('input',function(){checkStrength(pwdInput.value);checkMatch();});
+confInput.addEventListener('input',checkMatch);
 
-  var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 80;
-
-  var PARTICLE_COUNT = 160;
-  var positions = new Float32Array(PARTICLE_COUNT * 3);
-  var velocities = [];
-  var nodePos = [];
-
-  for (var i = 0; i < PARTICLE_COUNT; i++) {
-    var x = (Math.random() - 0.5) * 200;
-    var y = (Math.random() - 0.5) * 160;
-    var z = (Math.random() - 0.5) * 80;
-    positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
-    nodePos.push(new THREE.Vector3(x, y, z));
-    velocities.push(new THREE.Vector3(
-      (Math.random()-0.5)*0.09,
-      (Math.random()-0.5)*0.09,
-      (Math.random()-0.5)*0.05
-    ));
-  }
-
-  var pGeom = new THREE.BufferGeometry();
-  pGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  var pMat = new THREE.PointsMaterial({ color: 0x00ff99, size: 1.4, transparent: true, opacity: 0.75, sizeAttenuation: true });
-  var points = new THREE.Points(pGeom, pMat);
-  scene.add(points);
-
-  var MAX_DIST = 30, MAX_LINES = 280;
-  var lp = new Float32Array(MAX_LINES * 6);
-  var lGeom = new THREE.BufferGeometry();
-  lGeom.setAttribute('position', new THREE.BufferAttribute(lp, 3));
-  var lMat = new THREE.LineBasicMaterial({ color: 0x00ff99, transparent: true, opacity: 0.13 });
-  scene.add(new THREE.LineSegments(lGeom, lMat));
-
-  var mouseX = 0, mouseY = 0;
-  document.addEventListener('mousemove', function(e) {
-    mouseX = (e.clientX / window.innerWidth - 0.5) * 0.4;
-    mouseY = (e.clientY / window.innerHeight - 0.5) * 0.3;
-  });
-  window.addEventListener('resize', function() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-  function animate() {
-    requestAnimationFrame(animate);
-    var pos = pGeom.attributes.position.array;
-    for (var i = 0; i < PARTICLE_COUNT; i++) {
-      pos[i*3]   += velocities[i].x;
-      pos[i*3+1] += velocities[i].y;
-      pos[i*3+2] += velocities[i].z;
-      if (Math.abs(pos[i*3])   > 100) velocities[i].x *= -1;
-      if (Math.abs(pos[i*3+1]) > 80)  velocities[i].y *= -1;
-      if (Math.abs(pos[i*3+2]) > 40)  velocities[i].z *= -1;
-      nodePos[i].set(pos[i*3], pos[i*3+1], pos[i*3+2]);
-    }
-    pGeom.attributes.position.needsUpdate = true;
-    var li = 0;
-    for (var a = 0; a < PARTICLE_COUNT && li < MAX_LINES; a++) {
-      for (var b = a+1; b < PARTICLE_COUNT && li < MAX_LINES; b++) {
-        if (nodePos[a].distanceTo(nodePos[b]) < MAX_DIST) {
-          lp[li*6]=pos[a*3];lp[li*6+1]=pos[a*3+1];lp[li*6+2]=pos[a*3+2];
-          lp[li*6+3]=pos[b*3];lp[li*6+4]=pos[b*3+1];lp[li*6+5]=pos[b*3+2];
-          li++;
-        }
-      }
-    }
-    for (var k = li; k < MAX_LINES; k++) { lp[k*6]=lp[k*6+1]=lp[k*6+2]=lp[k*6+3]=lp[k*6+4]=lp[k*6+5]=0; }
-    lGeom.attributes.position.needsUpdate = true;
-    camera.position.x += (mouseX*15 - camera.position.x) * 0.025;
-    camera.position.y += (-mouseY*10 - camera.position.y) * 0.025;
-    camera.lookAt(scene.position);
-    renderer.render(scene, camera);
-  }
-  animate();
+(function(){
+    var canvas=document.getElementById('three-canvas'),renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,200);
+    camera.position.z=40;
+    function resize(){renderer.setSize(window.innerWidth,window.innerHeight);camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();}
+    resize();window.addEventListener('resize',resize);
+    var count=280,geo=new THREE.BufferGeometry(),positions=new Float32Array(count*3),colors2=new Float32Array(count*3);
+    for(var i=0;i<count;i++){positions[i*3]=(Math.random()-0.5)*120;positions[i*3+1]=(Math.random()-0.5)*80;positions[i*3+2]=(Math.random()-0.5)*60;var t=Math.random();if(t<0.6){colors2[i*3]=0;colors2[i*3+1]=0.8+Math.random()*0.2;colors2[i*3+2]=0.5+Math.random()*0.5;}else{colors2[i*3]=0.3+Math.random()*0.3;colors2[i*3+1]=0.1+Math.random()*0.2;colors2[i*3+2]=0.8+Math.random()*0.2;}}
+    geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('color',new THREE.BufferAttribute(colors2,3));
+    var mat=new THREE.PointsMaterial({size:0.35,vertexColors:true,transparent:true,opacity:0.7,sizeAttenuation:true});
+    scene.add(new THREE.Points(geo,mat));
+    var cubes=[];
+    for(var j=0;j<6;j++){var sz=3+Math.random()*5,cube=new THREE.Mesh(new THREE.BoxGeometry(sz,sz,sz),new THREE.MeshBasicMaterial({color:0x6366f1,wireframe:true,transparent:true,opacity:0.08}));cube.position.set((Math.random()-0.5)*80,(Math.random()-0.5)*50,(Math.random()-0.5)*30);cube.userData={rx:(Math.random()-0.5)*0.01,ry:(Math.random()-0.5)*0.01,rz:(Math.random()-0.5)*0.005};scene.add(cube);cubes.push(cube);}
+    for(var k=0;k<4;k++){var ico=new THREE.Mesh(new THREE.IcosahedronGeometry(2+Math.random()*3,0),new THREE.MeshBasicMaterial({color:0x00ffb3,wireframe:true,transparent:true,opacity:0.07}));ico.position.set((Math.random()-0.5)*80,(Math.random()-0.5)*50,(Math.random()-0.5)*30);ico.userData={rx:(Math.random()-0.5)*0.012,ry:(Math.random()-0.5)*0.012};scene.add(ico);cubes.push(ico);}
+    var mouse={x:0,y:0};document.addEventListener('mousemove',function(e){mouse.x=(e.clientX/window.innerWidth-0.5)*0.4;mouse.y=(e.clientY/window.innerHeight-0.5)*0.4;});
+    var clock=new THREE.Clock();
+    function animate(){requestAnimationFrame(animate);var t=clock.getElapsedTime();scene.children[0].rotation.y=t*0.03;scene.children[0].rotation.x=Math.sin(t*0.015)*0.1;cubes.forEach(function(c){c.rotation.x+=c.userData.rx;c.rotation.y+=c.userData.ry;if(c.userData.rz)c.rotation.z+=c.userData.rz;});camera.position.x+=(mouse.x*8-camera.position.x)*0.03;camera.position.y+=(-mouse.y*5-camera.position.y)*0.03;camera.lookAt(scene.position);renderer.render(scene,camera);}
+    animate();
 })();
 </script>
-
 </body>
 </html>
