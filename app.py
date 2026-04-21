@@ -224,7 +224,7 @@ def rule_based(m):
     fs = max(0, fs - (m["neg"]*8+( m["real"]>=2)*10+(m["wc"]>50)*5+(m["gen"]==0)*5))
     v = "FAKE" if fs>=25 else "GENUINE"
     return dict(verdict=v, confidence=min(93,48+fs) if v=="FAKE" else min(82,65-fs//2),
-                reason=f"Rule-based: {len(red)} fake, {len(green)} genuine signals. Add ANTHROPIC_API_KEY for AI analysis.",
+                reason=f"Rule-based: {len(red)} fake, {len(green)} genuine signals. Add tool for analysis.",
                 red_flags=red, green_flags=green)
 
 # ── ROUTES ────────────────────────────────────────────────────────────────────
