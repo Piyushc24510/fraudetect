@@ -845,7 +845,7 @@ if __name__ == "__main__":
     debug = os.environ.get("FLASK_ENV") != "production"
     app.run(
         debug=False,           # never True on Streamlit Cloud — triggers signal error
-        host="0.0.0.0",        # required for Streamlit Cloud / external access
+        host="127.0.0.1",      # bind to localhost only for single address access
         port=port,
         use_reloader=False,    # fixes: signal.signal(SIGTERM) ValueError
         threaded=True,
