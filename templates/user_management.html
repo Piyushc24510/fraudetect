@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
@@ -7,20 +7,18 @@
     <title>User Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
-        :root[data-theme="dark"]  { --bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#00ff99;--accent2:#00cc7a;--text:#e6edf3;--muted:#8b949e;--fake:#ff5555;--genuine:#00ff99;--sidebar-w:260px;--input-bg:#0d1117; }
-        :root[data-theme="light"] { --bg:#ffffff;--card:#f6f8fa;--border:#d0d7de;--accent:#00884d;--accent2:#006637;--text:#24292f;--muted:#57606a;--fake:#d93025;--genuine:#137333;--sidebar-w:260px;--input-bg:#ffffff; }
+        :root  { --bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#00ff99;--accent2:#00cc7a;--text:#e6edf3;--muted:#8b949e;--fake:#ff5555;--genuine:#00ff99;--sidebar-w:260px;--input-bg:#0d1117; }
 
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.3s,color 0.3s;}
 
         /* ── Sidebar ── */
-        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;transition:transform 0.3s;}
+        .sidebar{position:fixed;z-index:200;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;transition:transform 0.3s;}
         .logo-area{text-align:center;margin-bottom:28px;}
         .logo-area .icon{font-size:38px;color:var(--accent);}
         .logo-area h3{font-size:16px;color:var(--accent);margin-top:8px;letter-spacing:1px;}
         .logo-area small{font-size:11px;color:var(--muted);}
-        .theme-toggle{width:100%;padding:10px;background:rgba(0,255,153,0.08);border:1px solid var(--accent);color:var(--accent);border-radius:8px;cursor:pointer;margin-bottom:15px;font-size:13px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
-        .theme-toggle:hover{background:rgba(0,255,153,0.15);}
+
         .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
         .nav-link i{width:17px;text-align:center;}
         .nav-link:hover{background:rgba(0,255,153,0.09);color:var(--accent);}
@@ -35,7 +33,7 @@
         .logout-btn:hover{background:rgba(255,85,85,0.1);}
 
         /* ── Main ── */
-        .main{margin-left:var(--sidebar-w);padding:32px 28px;}
+        .main{position:relative;z-index:1;margin-left:var(--sidebar-w);padding:32px 28px;}
         .page-head{margin-bottom:26px;}
         .page-head h1{font-size:26px;font-weight:700;}
         .page-head p{color:var(--muted);font-size:14px;margin-top:5px;}
@@ -121,7 +119,7 @@
         @media(max-width:860px){
             .sidebar{transform:translateX(-100%);}
             .sidebar.open{transform:translateX(0);}
-            .main{margin-left:0;padding:20px 16px;padding-top:60px;}
+            .main{position:relative;z-index:1;margin-left:0;padding:20px 16px;padding-top:60px;}
             .mob-menu{display:flex!important;}
             .stats-row{grid-template-columns:1fr 1fr;}
             .toolbar{flex-direction:column;align-items:stretch;}
@@ -140,10 +138,6 @@
         <h3>FraudDetect</h3>
         <small>Review Analysis System</small>
     </div>
-    <button class="theme-toggle" onclick="toggleTheme()">
-        <i class="fa fa-moon" id="themeIcon"></i>
-        <span id="themeText">Dark Mode</span>
-    </button>
     <a href="/dashboard" class="nav-link"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
     <a href="/check"     class="nav-link"><i class="fa fa-search"></i> Check Review</a>
     <a href="/history"   class="nav-link"><i class="fa fa-history"></i> History</a>
@@ -388,7 +382,6 @@ function toggleSidebar() {
 // Theme
 (function(){
     var s = localStorage.getItem('appTheme') || 'dark';
-    document.documentElement.setAttribute('data-theme', s);
 })();
 function updateTheme(theme) {
     var icon = document.getElementById('themeIcon');
@@ -397,16 +390,87 @@ function updateTheme(theme) {
     if (theme === 'dark') { icon.className = 'fa fa-sun';  text.textContent = 'Light Mode'; }
     else                  { icon.className = 'fa fa-moon'; text.textContent = 'Dark Mode';  }
 }
-function toggleTheme() {
-    var cur  = document.documentElement.getAttribute('data-theme') || 'dark';
-    var next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('appTheme', next);
-    updateTheme(next);
-}
 document.addEventListener('DOMContentLoaded', function() {
     updateTheme(localStorage.getItem('appTheme') || 'dark');
 });
+</script>
+
+
+<!-- THREE.JS 3D AMBIENT BACKGROUND -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<canvas id="bg3d" style="position:fixed;top:0;left:260px;width:calc(100% - 260px);height:100%;z-index:0;pointer-events:none;opacity:0.6;"></canvas>
+<script>
+(function() {
+  var canvas = document.getElementById('bg3d');
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  var W = window.innerWidth - 260, H = window.innerHeight;
+  renderer.setSize(W, H);
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 1000);
+  camera.position.z = 90;
+
+  var N = 120;
+  var pos = new Float32Array(N * 3);
+  var vel = [];
+  var npos = [];
+  for (var i = 0; i < N; i++) {
+    var x = (Math.random()-0.5)*180, y = (Math.random()-0.5)*140, z = (Math.random()-0.5)*60;
+    pos[i*3]=x; pos[i*3+1]=y; pos[i*3+2]=z;
+    npos.push(new THREE.Vector3(x,y,z));
+    vel.push(new THREE.Vector3((Math.random()-0.5)*0.06,(Math.random()-0.5)*0.06,(Math.random()-0.5)*0.03));
+  }
+  var pg = new THREE.BufferGeometry();
+  pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  var pm = new THREE.PointsMaterial({ color: 0x00ff99, size: 1.0, transparent: true, opacity: 0.5, sizeAttenuation: true });
+  scene.add(new THREE.Points(pg, pm));
+
+  var ML = 200, lp = new Float32Array(ML*6);
+  var lg = new THREE.BufferGeometry();
+  lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
+  var lm = new THREE.LineBasicMaterial({ color: 0x00ff99, transparent: true, opacity: 0.07 });
+  scene.add(new THREE.LineSegments(lg, lm));
+
+  window.addEventListener('resize', function() {
+    var nW = window.innerWidth - 260, nH = window.innerHeight;
+    camera.aspect = nW / nH; camera.updateProjectionMatrix();
+    renderer.setSize(nW, nH);
+  });
+
+  var t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.003;
+    for (var i = 0; i < N; i++) {
+      pos[i*3]   += vel[i].x;
+      pos[i*3+1] += vel[i].y;
+      pos[i*3+2] += vel[i].z;
+      if (Math.abs(pos[i*3])   > 90)  vel[i].x *= -1;
+      if (Math.abs(pos[i*3+1]) > 70)  vel[i].y *= -1;
+      if (Math.abs(pos[i*3+2]) > 30)  vel[i].z *= -1;
+      npos[i].set(pos[i*3], pos[i*3+1], pos[i*3+2]);
+    }
+    pg.attributes.position.needsUpdate = true;
+    var li = 0, MD = 28;
+    for (var a = 0; a < N && li < ML; a++) {
+      for (var b = a+1; b < N && li < ML; b++) {
+        if (npos[a].distanceTo(npos[b]) < MD) {
+          lp[li*6]=pos[a*3];lp[li*6+1]=pos[a*3+1];lp[li*6+2]=pos[a*3+2];
+          lp[li*6+3]=pos[b*3];lp[li*6+4]=pos[b*3+1];lp[li*6+5]=pos[b*3+2];
+          li++;
+        }
+      }
+    }
+    for (var k=li;k<ML;k++){lp[k*6]=lp[k*6+1]=lp[k*6+2]=lp[k*6+3]=lp[k*6+4]=lp[k*6+5]=0;}
+    lg.attributes.position.needsUpdate = true;
+    camera.position.x = Math.sin(t) * 5;
+    camera.position.y = Math.cos(t * 0.7) * 3;
+    camera.lookAt(scene.position);
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
 </script>
 
 </body>
