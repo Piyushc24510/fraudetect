@@ -1,0 +1,11 @@
+flask
+Werkzeug
+nltk
+textstat
+scikit-learn
+pandas
+numpy
+reportlab
+openpyxl
+gunicorn
+setuptools

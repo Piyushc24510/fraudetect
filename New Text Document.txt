@@ -1,0 +1,88 @@
+Online Review Fraud Detection System Using NLP
+(Easy Explanation – BCA Level)
+🔹 Problem Statement (Easy)
+
+Aaj online shopping, hotels aur apps me log reviews padh kar decision lete hain.
+Lekin kuch log fake reviews likhte hain taaki product ko zyada acha ya bura dikhaya ja sake.
+In fake reviews ki wajah se customers confuse ho jaate hain.
+
+👉 Is problem ko solve karne ke liye hum NLP based system banate hain jo batata hai:
+review fake hai ya genuine.
+
+🔹 Objective (Easy Points)
+
+Fake reviews identify karna
+
+NLP ka use karke review text analyze karna
+
+User ko quick result dena
+
+Online trust improve karna
+
+🔹 NLP Kya Hai? (Very Simple)
+
+NLP (Natural Language Processing) computer ko human language samjhane ki technique hai.
+
+Example:
+
+“This product is best ever!!!”
+NLP is sentence ke words aur pattern analyze karta hai.
+
+🔹 System Kaise Work Karta Hai?
+
+1️⃣ User review enter karta hai
+2️⃣ NLP review ko clean karta hai (extra words hata deta hai)
+3️⃣ Machine Learning model check karta hai
+4️⃣ Result show hota hai:
+
+✅ Genuine Review
+
+🚨 Fake Review
+
+🔹 Modules (Simple)
+
+User Interface
+
+Review Preprocessing (NLP)
+
+Feature Extraction
+
+Fraud Detection Model
+
+Result Display
+
+🔹 Technologies Used
+Part	Technology
+Language	Python
+NLP	NLTK
+ML	Scikit-learn
+Backend	Flask
+Frontend	HTML, CSS
+🔹 Advantages
+
+Automatic fraud detection
+
+Time saving
+
+Human error kam hota hai
+
+Trust improve hota hai
+
+🔹 Future Scope
+
+Deep Learning models use kar sakte hain
+
+Login & Admin panel
+
+Real websites ke sath integration
+
+🔹 Viva Ready Short Answers
+
+Q: NLP kyu use kiya?
+👉 NLP text ko samajhne aur analyze karne me help karta hai.
+
+Q: Is system ka main goal kya hai?
+👉 Online fake reviews ko detect karna.
+
+Q: Output kya hota hai?
+👉 Fake ya Genuine review.

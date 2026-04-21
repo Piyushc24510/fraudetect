@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root[data-theme="dark"] {
+            --bg-body: #0a0a0a;
+            --bg-card: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent: #00ff99;
+            --accent-hover: #00cc7a;
+            --border-color: #333333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .error-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg-card);
+            padding: 60px 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 30px rgba(0, 255, 153, 0.15);
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 80px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .error-code {
+            font-size: 100px;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(0, 255, 153, 0.5);
+            margin-bottom: 15px;
+            line-height: 1;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: #000;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 153, 0.4);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .links {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .links a {
+            color: var(--accent);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .links a:hover {
+            color: var(--accent-hover);
+        }
+
+        @media (max-width: 480px) {
+            .error-container {
+                padding: 40px 24px;
+            }
+            .error-code {
+                font-size: 70px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            p {
+                font-size: 14px;
+            }
+            .btn {
+                padding: 12px 30px;
+                font-size: 14px;
+            }
+            .links a {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fa fa-exclamation-triangle"></i>
+        </div>
+        <div class="error-code">404</div>
+        <h1>Page Not Found</h1>
+        <p>The page you're looking for doesn't exist or has been moved. Please check the URL or return to the dashboard.</p>
+        
+        <a href="/dashboard" class="btn">
+            <i class="fa fa-home"></i> Go to Dashboard
+        </a>
+
+        <div class="links">
+            <a href="/login"><i class="fa fa-sign-in-alt"></i> Login</a>
+            <a href="/check"><i class="fa fa-search"></i> Check Review</a>
+            <a href="/history"><i class="fa fa-clock"></i> History</a>
+        </div>
+    </div>
+</body>
+</html>

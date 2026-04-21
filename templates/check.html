@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Review - FraudDetect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root { --bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#00ff99;--accent2:#00cc7a;--text:#e6edf3;--muted:#8b949e;--fake:#ff5555;--genuine:#00ff99;--sidebar-w:260px; }
+        :root[data-theme="light"] { --bg:#f6f8fa;--card:#ffffff;--border:#d0d7de;--accent:#00884d;--accent2:#006637;--text:#1a1a2e;--muted:#57606a;--fake:#d93025;--genuine:#137333;--sidebar-w:260px; }
+        [data-theme="light"] body{background:#f6f8fa;}
+        [data-theme="light"] .sidebar{background:#fff;border-right-color:#d0d7de;}
+        [data-theme="light"] .logo-area .icon,[data-theme="light"] .logo-area h3{color:#00884d;}
+        [data-theme="light"] .theme-toggle{background:rgba(0,136,77,0.08);border-color:#00884d;color:#00884d;}
+        [data-theme="light"] .nav-link{color:#57606a;}
+        [data-theme="light"] .nav-link:hover{background:rgba(0,136,77,0.09);color:#00884d;}
+        [data-theme="light"] .nav-link.active{background:rgba(0,136,77,0.12);color:#00884d;}
+        [data-theme="light"] .divider{background:#d0d7de;}
+        [data-theme="light"] .user-card{background:rgba(0,136,77,0.05);border-color:rgba(0,136,77,0.2);}
+        [data-theme="light"] .user-card .uname i{color:#00884d;}
+        [data-theme="light"] .role-pill{background:rgba(0,136,77,0.1);color:#00884d;}
+        [data-theme="light"] .card{background:#fff;border-color:#d0d7de;}
+        [data-theme="light"] textarea{background:#f6f8fa;color:#1a1a2e;border-color:#d0d7de;}
+        [data-theme="light"] textarea:focus{border-color:#00884d;box-shadow:0 0 0 3px rgba(0,136,77,0.12);}
+        [data-theme="light"] .submit-btn{background:linear-gradient(90deg,#00884d,#006637);}
+        [data-theme="light"] .result-card{background:#fff;border-color:#d0d7de;}
+        [data-theme="light"] .result-header.fake{background:linear-gradient(135deg,#fde8e8,#fbd0d0);border-bottom-color:rgba(217,48,37,0.3);}
+        [data-theme="light"] .result-header.genuine{background:linear-gradient(135deg,#e6f4ea,#c8e6c9);border-bottom-color:rgba(19,115,51,0.3);}
+        [data-theme="light"] .result-header.fake h2{color:#d93025;}
+        [data-theme="light"] .result-header.genuine h2{color:#137333;}
+        [data-theme="light"] .conf-fake{color:#d93025;}
+        [data-theme="light"] .conf-genuine{color:#137333;}
+        [data-theme="light"] .threat-badge.critical{background:rgba(217,48,37,0.1);color:#d93025;border-color:rgba(217,48,37,0.3);}
+        [data-theme="light"] .threat-badge.low{background:rgba(19,115,51,0.1);color:#137333;border-color:rgba(19,115,51,0.3);}
+        [data-theme="light"] .prob-track{background:#e0e0e0;}
+        [data-theme="light"] .summary-box{background:rgba(0,136,77,0.05);border-color:rgba(0,136,77,0.2);}
+        [data-theme="light"] .flags-title.red{background:rgba(217,48,37,0.07);color:#d93025;border-color:rgba(217,48,37,0.2);}
+        [data-theme="light"] .flags-title.green{background:rgba(19,115,51,0.07);color:#137333;border-color:rgba(19,115,51,0.2);}
+        [data-theme="light"] .flag-item.red{background:rgba(217,48,37,0.04);border-left-color:#d93025;}
+        [data-theme="light"] .flag-item.green{background:rgba(19,115,51,0.04);border-left-color:#137333;}
+        [data-theme="light"] .flag-item.red i{color:#d93025;}
+        [data-theme="light"] .flag-item.green i{color:#137333;}
+        [data-theme="light"] .tech-item{background:#f6f8fa;border-color:#d0d7de;}
+        [data-theme="light"] .tech-val{color:#00884d;}
+        [data-theme="light"] .reviewed-text{background:#f6f8fa;border-color:#d0d7de;border-left-color:#00884d;}
+        [data-theme="light"] .reviewed-text strong{color:#00884d;}
+        [data-theme="light"] .mob-menu{background:#00884d;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+        .logo-area{text-align:center;margin-bottom:28px;}
+        .logo-area .icon{font-size:38px;color:var(--accent);}
+        .logo-area h3{font-size:16px;color:var(--accent);margin-top:8px;letter-spacing:1px;}
+        .logo-area small{font-size:11px;color:var(--muted);}
+        .theme-toggle{width:100%;padding:10px;background:rgba(0,255,153,0.08);border:1px solid var(--accent);color:var(--accent);border-radius:8px;cursor:pointer;margin-bottom:15px;font-size:13px;transition:all 0.2s;}
+        .theme-toggle:hover{background:rgba(0,255,153,0.15);}
+
+        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
+        .nav-link i{width:17px;text-align:center;}
+        .nav-link:hover{background:rgba(0,255,153,0.09);color:var(--accent);}
+        .nav-link.active{background:rgba(0,255,153,0.14);color:var(--accent);font-weight:600;}
+        .divider{height:1px;background:var(--border);margin:10px 0;}
+        .bottom-area{margin-top:auto;}
+        .user-card{background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.18);border-radius:10px;padding:13px;margin-bottom:10px;}
+        .user-card .uname{font-size:13px;font-weight:600;}
+        .user-card .uname i{color:var(--accent);margin-right:6px;}
+        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:var(--accent);margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
+        .logout-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
+        .logout-btn:hover{background:rgba(255,85,85,0.1);}
+        .main{margin-left:var(--sidebar-w);padding:32px 28px;}
+        .page-head{margin-bottom:26px;}
+        .page-head h1{font-size:26px;font-weight:700;}
+        .page-head p{color:var(--muted);font-size:14px;margin-top:5px;}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:28px;margin-bottom:24px;}
+        .card-hd{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:9px;}
+        .card-hd i{color:var(--accent);}
+        textarea{width:100%;min-height:120px;max-height:200px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;resize:vertical;line-height:1.6;transition:border 0.2s;}
+        textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,255,153,0.1);}
+        textarea::placeholder{color:var(--muted);}
+        .submit-btn{display:inline-flex;align-items:center;gap:9px;margin-top:14px;padding:13px 28px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
+        .submit-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,255,153,0.35);}
+        .submit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+        .loading{display:none;text-align:center;padding:30px;}
+        .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .sec-banner{display:none;padding:12px 20px;text-align:center;font-weight:600;font-size:13px;border-radius:9px;margin-bottom:20px;}
+        .sec-banner.critical{background:rgba(255,85,85,0.12);color:var(--fake);border:1px solid rgba(255,85,85,0.3);display:block;}
+        .sec-banner.high{background:rgba(255,120,0,0.12);color:#ff8800;border:1px solid rgba(255,120,0,0.3);display:block;}
+        .sec-banner.medium{background:rgba(255,200,0,0.1);color:#ffcc00;border:1px solid rgba(255,200,0,0.3);display:block;}
+        .result-card{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:24px;}
+        .result-header{padding:28px;text-align:center;}
+        .result-header.fake{background:linear-gradient(135deg,#2d0808,#1a0505);border-bottom:2px solid rgba(255,85,85,0.3);}
+        .result-header.genuine{background:linear-gradient(135deg,#0a2d1a,#061a0f);border-bottom:2px solid rgba(0,255,153,0.3);}
+        .result-icon{font-size:52px;margin-bottom:12px;}
+        .result-header h2{font-size:22px;margin-bottom:8px;}
+        .result-header.fake h2{color:var(--fake);}
+        .result-header.genuine h2{color:var(--accent);}
+        .threat-badge{display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px;margin-bottom:20px;}
+        .threat-badge.critical{background:rgba(255,85,85,0.15);color:var(--fake);border:1px solid rgba(255,85,85,0.3);}
+        .threat-badge.low{background:rgba(0,255,153,0.15);color:var(--accent);border:1px solid rgba(0,255,153,0.3);}
+        .prob-bars{max-width:420px;margin:0 auto;}
+        .prob-row{margin-bottom:12px;}
+        .prob-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;}
+        .prob-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+        .prob-fill{height:100%;border-radius:4px;width:0;transition:width 0.8s ease;}
+        .prob-fill.fake{background:linear-gradient(90deg,#ff5555,#cc3333);}
+        .prob-fill.genuine{background:linear-gradient(90deg,#00ff99,#00cc7a);}
+        .analysis-body{padding:24px;}
+        .summary-box{background:rgba(0,255,153,0.05);border:1px solid rgba(0,255,153,0.15);border-radius:10px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.6;}
+        .flags-section{margin-bottom:18px;}
+        .flags-title{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:10px;}
+        .flags-title.red{background:rgba(255,85,85,0.08);color:var(--fake);border:1px solid rgba(255,85,85,0.2);}
+        .flags-title.green{background:rgba(0,255,153,0.08);color:var(--accent);border:1px solid rgba(0,255,153,0.2);}
+        .flag-item{display:flex;align-items:flex-start;gap:10px;padding:9px 13px;border-radius:7px;margin-bottom:6px;font-size:13px;line-height:1.5;}
+        .flag-item.red{background:rgba(255,85,85,0.05);border-left:3px solid var(--fake);}
+        .flag-item.green{background:rgba(0,255,153,0.05);border-left:3px solid var(--accent);}
+        .flag-item i{margin-top:2px;flex-shrink:0;}
+        .flag-item.red i{color:var(--fake);}
+        .flag-item.green i{color:var(--accent);}
+        .tech-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:12px;}
+        .tech-item{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:14px;text-align:center;}
+        .tech-val{font-size:22px;font-weight:700;color:var(--accent);line-height:1;}
+        .tech-lbl{font-size:11px;color:var(--muted);margin-top:4px;}
+        .reviewed-text{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;padding:16px;margin-top:18px;font-size:13px;color:var(--muted);line-height:1.6;}
+        .reviewed-text strong{color:var(--accent);display:block;margin-bottom:6px;}
+        .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:190;}
+        .overlay.show{display:block;}
+        @media(max-width:860px){.sidebar{transform:translateX(-100%);transition:transform 0.3s;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;padding:20px 16px;padding-top:60px;}.mob-menu{display:flex!important;}.tech-grid{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:480px){.main{padding:14px;padding-top:60px;}}
+
+        /* ── Claude AI Analysis Card ── */
+        .ai-card{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:24px;}
+        .ai-card-header{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--border);background:rgba(99,102,241,0.07);}
+        .ai-card-header .ai-logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+        .ai-card-header h3{font-size:15px;font-weight:700;color:var(--text);}
+        .ai-card-header small{font-size:12px;color:var(--muted);}
+        .ai-card-body{padding:22px 24px;}
+        .ai-loading{text-align:center;padding:30px 0;}
+        .ai-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;}
+        .ai-verdict-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+        .ai-verdict-pill{padding:7px 20px;border-radius:30px;font-size:13px;font-weight:800;letter-spacing:.6px;}
+        .ai-verdict-pill.fake{background:rgba(255,85,85,0.15);color:var(--fake);border:1px solid rgba(255,85,85,0.35);}
+        .ai-verdict-pill.genuine{background:rgba(0,255,153,0.13);color:var(--accent);border:1px solid rgba(0,255,153,0.3);}
+        .ai-conf-text{font-size:13px;color:var(--muted);}
+        .ai-conf-text span{font-weight:700;color:var(--text);}
+        .ai-reason{font-size:13px;line-height:1.65;color:var(--text);background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:9px;padding:13px 16px;margin-bottom:16px;}
+        .ai-flags-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+        @media(max-width:600px){.ai-flags-row{grid-template-columns:1fr;}}
+        .ai-flags-box{border-radius:9px;padding:13px 15px;}
+        .ai-flags-box.red{background:rgba(255,85,85,0.05);border:1px solid rgba(255,85,85,0.2);}
+        .ai-flags-box.green{background:rgba(0,255,153,0.05);border:1px solid rgba(0,255,153,0.2);}
+        .ai-flags-title{font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+        .ai-flags-box.red .ai-flags-title{color:var(--fake);}
+        .ai-flags-box.green .ai-flags-title{color:var(--accent);}
+        .ai-flag-item{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;align-items:flex-start;gap:7px;line-height:1.4;}
+        .ai-flag-item:last-child{border-bottom:none;}
+        .ai-flag-item i{flex-shrink:0;margin-top:2px;font-size:11px;}
+        .ai-flags-box.red .ai-flag-item i{color:var(--fake);}
+        .ai-flags-box.green .ai-flag-item i{color:var(--accent);}
+        .ai-empty{font-size:12px;color:var(--muted);font-style:italic;}
+        .ai-error{background:rgba(255,85,85,0.08);border:1px solid rgba(255,85,85,0.25);border-radius:9px;padding:14px 16px;color:#ff8080;font-size:13px;line-height:1.6;}
+        .ai-conf-bar-wrap{margin-bottom:16px;}
+        .ai-conf-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;}
+        .ai-conf-track{height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
+        .ai-conf-fill{height:100%;border-radius:4px;width:0;transition:width .9s ease;}
+        .ai-conf-fill.fake{background:linear-gradient(90deg,#ff5555,#cc3333);}
+        .ai-conf-fill.genuine{background:linear-gradient(90deg,#00ff99,#00cc7a);}
+        [data-theme="light"] .ai-card-header{background:rgba(99,102,241,0.05);}
+        [data-theme="light"] .ai-reason{background:rgba(99,102,241,0.04);border-color:rgba(99,102,241,0.1);}
+    </style>
+</head>
+<body>
+<button class="mob-menu" id="menuBtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+        <i class="fa fa-shield-alt icon"></i>
+        <h3>FraudDetect</h3>
+        <small>Review Analysis System</small>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fa fa-moon" id="themeIcon"></i>
+        <span id="themeText">Dark Mode</span>
+    </button>
+    {% if user_role == 'admin' %}
+    <a href="/dashboard" class="nav-link"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+    {% else %}
+    <a href="/user-dashboard" class="nav-link"><i class="fa fa-tachometer-alt"></i> My Dashboard</a>
+    {% endif %}
+    <a href="/check" class="nav-link active"><i class="fa fa-search"></i> Check Review</a>
+    <a href="/history" class="nav-link"><i class="fa fa-history"></i> History</a>
+    {% if user_role == 'admin' %}
+    <a href="/analytics" class="nav-link"><i class="fa fa-chart-line"></i> Analytics</a>
+    <a href="/users" class="nav-link"><i class="fa fa-users"></i> User Management</a>
+    {% endif %}
+    <div class="divider"></div>
+    <div class="bottom-area">
+        <div class="user-card">
+            <div class="uname"><i class="fa fa-user-circle"></i>{{ user_name if user_name else "User" }}</div>
+            <span class="role-pill">{{ user_role if user_role else "user" }}</span>
+        </div>
+        <a href="/logout" class="logout-btn"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-head">
+        <h1><i class="fa fa-search" style="color:var(--accent);margin-right:10px;"></i>Check a Review</h1>
+        <p>Paste any review below to instantly detect if it's fake or genuine.</p>
+    </div>
+
+    <div id="secBanner" class="sec-banner"></div>
+
+    <div class="card">
+        <div class="card-hd"><i class="fa fa-edit"></i> Enter Review Text</div>
+        <form method="POST" onsubmit="return onSubmit()">
+            <textarea name="review" placeholder="Paste the review text here... (minimum 10 characters)" required minlength="10">{{ review if review else '' }}</textarea>
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <i class="fa fa-bolt"></i> Analyze Review
+            </button>
+        </form>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="color:var(--muted);font-size:14px;margin-top:8px;">Analyzing your review...</p>
+        </div>
+    </div>
+
+    {% if result %}
+    <div class="result-card">
+        <div class="result-header {% if result.is_fake %}fake{% else %}genuine{% endif %}">
+            <div class="result-icon">{% if result.is_fake %}⚠️{% else %}✅{% endif %}</div>
+            <h2>{% if result.is_fake %}Fake Review Detected!{% else %}Genuine Review{% endif %}</h2>
+            <span class="threat-badge {% if result.is_fake %}critical{% else %}low{% endif %}">
+                <i class="fa fa-shield-alt"></i>
+                {% if result.is_fake %}CRITICAL THREAT{% else %}LOW THREAT LEVEL{% endif %}
+            </span>
+            <div class="prob-bars">
+                <div class="prob-row">
+                    <div class="prob-label"><span>Fake Probability</span><span>{{ result.fake_probability|default(0) }}%</span></div>
+                    <div class="prob-track"><div class="prob-fill fake" data-w="{{ result.fake_probability|default(0) }}"></div></div>
+                </div>
+                <div class="prob-row">
+                    <div class="prob-label"><span>Genuine Probability</span><span>{{ result.genuine_probability|default(0) }}%</span></div>
+                    <div class="prob-track"><div class="prob-fill genuine" data-w="{{ result.genuine_probability|default(0) }}"></div></div>
+                </div>
+            </div>
+        </div>
+        {% if result.explanation %}
+        <div class="analysis-body">
+            <div class="card-hd"><i class="fa fa-brain"></i> AI Analysis</div>
+            <div class="summary-box">{{ result.explanation.summary|default('') }}</div>
+            {% if result.explanation.red_flags %}
+            <div class="flags-section">
+                <div class="flags-title red"><i class="fa fa-exclamation-circle"></i> Red Flags ({{ result.explanation.red_flags|length }})</div>
+                {% for f in result.explanation.red_flags %}<div class="flag-item red"><i class="fa fa-times-circle"></i><span>{{ f }}</span></div>{% endfor %}
+            </div>
+            {% endif %}
+            {% if result.explanation.green_flags %}
+            <div class="flags-section">
+                <div class="flags-title green"><i class="fa fa-check-circle"></i> Positive Indicators ({{ result.explanation.green_flags|length }})</div>
+                {% for f in result.explanation.green_flags %}<div class="flag-item green"><i class="fa fa-check"></i><span>{{ f }}</span></div>{% endfor %}
+            </div>
+            {% endif %}
+            {% if result.explanation.technical_details %}
+            <div class="card-hd" style="margin-top:20px;"><i class="fa fa-chart-bar"></i> Technical Analysis</div>
+            <div class="tech-grid">
+                <div class="tech-item"><div class="tech-val">{{ result.explanation.technical_details.word_count|default(0) }}</div><div class="tech-lbl">Word Count</div></div>
+                <div class="tech-item"><div class="tech-val">{{ result.explanation.technical_details.unique_words|default(0) }}%</div><div class="tech-lbl">Word Diversity</div></div>
+                <div class="tech-item"><div class="tech-val">{{ result.explanation.technical_details.sentiment_score|default(0) }}</div><div class="tech-lbl">Sentiment</div></div>
+                <div class="tech-item"><div class="tech-val">{{ result.explanation.technical_details.exclamations|default(0) }}</div><div class="tech-lbl">Exclamations</div></div>
+                <div class="tech-item"><div class="tech-val">{{ result.explanation.technical_details.caps_ratio|default(0) }}%</div><div class="tech-lbl">Caps Ratio</div></div>
+                <div class="tech-item"><div class="tech-val">{{ result.explanation.technical_details.extreme_words|default(0) }}</div><div class="tech-lbl">Extreme Words</div></div>
+            </div>
+            {% endif %}
+            <div class="reviewed-text"><strong>📝 Analyzed Review:</strong>"{{ result.text|default('') }}"</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── Analysis Card (shown only when ML result is present) ── #}
+    {% if result %}
+    <div class="ai-card" id="aiCard">
+        <div class="ai-card-header">
+            <div class="ai-logo">🤖</div>
+            <div>
+                <h3>AI Analysis</h3>
+                <small>Deep language model verdict — powered by Anthropic Claude</small>
+            </div>
+        </div>
+        <div class="ai-card-body" id="aiCardBody">
+            <div class="ai-loading" id="aiLoading">
+                <div class="ai-spinner"></div>
+                <p style="color:var(--muted);font-size:13px;">They are analyzing the review…</p>
+            </div>
+            <div id="aiResult" style="display:none;"></div>
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+<script id="flask-result" type="application/json">{{ result | tojson if result else '{}' }}</script>
+<script>
+(function(){
+    document.querySelectorAll('.prob-fill[data-w]').forEach(function(el){
+        setTimeout(function(){el.style.width=el.getAttribute('data-w')+'%';},150);
+    });
+    var data={};
+    try{data=JSON.parse(document.getElementById('flask-result').textContent||'{}');}catch(e){}
+    if(data.is_fake && data.fake_probability>=40){
+        var b=document.getElementById('secBanner');
+        if(data.fake_probability>=80){b.className='sec-banner critical';b.innerHTML='<i class="fa fa-shield-alt"></i> CRITICAL: High probability fake review detected!';}
+        else if(data.fake_probability>=60){b.className='sec-banner high';b.innerHTML='<i class="fa fa-exclamation-triangle"></i> HIGH ALERT: Suspicious review detected.';}
+        else{b.className='sec-banner medium';b.innerHTML='<i class="fa fa-exclamation-circle"></i> MEDIUM ALERT: Review looks suspicious.';}
+    }
+})();
+function onSubmit(){
+    var t=document.querySelector('textarea[name="review"]');
+    if(!t||t.value.trim().length<10){return false;}
+    document.getElementById('submitBtn').disabled=true;
+    document.getElementById('loading').style.display='block';
+    return true;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateTheme(localStorage.getItem('appTheme') || 'dark');
+
+    // Auto-submit on Enter (Shift+Enter = new line)
+    var textarea = document.getElementById('reviewTextarea');
+    if (textarea) {
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (this.value.trim().length < 10) {
+                    this.style.borderColor = 'var(--fake)';
+                    this.style.boxShadow = '0 0 0 3px rgba(255,85,85,0.15)';
+                    var hint = document.getElementById('enterHint');
+                    if (hint) { hint.style.display = 'flex'; }
+                    setTimeout(function() {
+                        textarea.style.borderColor = '';
+                        textarea.style.boxShadow = '';
+                        if (hint) { hint.style.display = 'none'; }
+                    }, 2000);
+                    return;
+                }
+                if (onSubmit()) { textarea.closest('form').submit(); }
+            }
+        });
+    }
+});
+window.addEventListener('pageshow',function(){
+    var btn=document.getElementById('submitBtn');var ld=document.getElementById('loading');
+    if(btn)btn.disabled=false;if(ld)ld.style.display='none';
+});
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+</script>
+
+<script>
+(function(){var s=localStorage.getItem('appTheme')||'dark';document.documentElement.setAttribute('data-theme',s);})();
+function updateTheme(theme){var icon=document.getElementById('themeIcon');var text=document.getElementById('themeText');if(!icon||!text)return;if(theme==='dark'){icon.className='fa fa-sun';text.textContent='Light Mode';}else{icon.className='fa fa-moon';text.textContent='Dark Mode';}}
+function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme')||'dark';var next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('appTheme',next);updateTheme(next);}
+// theme init handled in DOMContentLoaded above
+</script>
+<script>
+/* ── Claude AI Analysis Auto-trigger ── */
+(function () {
+    var flaskData = {};
+    try { flaskData = JSON.parse(document.getElementById('flask-result').textContent || '{}'); } catch (e) {}
+    // Only run when ML result exists
+    if (!flaskData || !flaskData.text) return;
+    var reviewText = flaskData.text || '';
+    var aiResult   = document.getElementById('aiResult');
+    var aiLoading  = document.getElementById('aiLoading');
+    function renderFlags(flags, type) {
+        if (!flags || flags.length === 0) {
+            return '<p class="ai-empty">None detected</p>';
+        }
+        return flags.map(function (f) {
+            return '<div class="ai-flag-item"><i class="fa fa-' +
+                (type === 'red' ? 'times-circle' : 'check-circle') + '"></i><span>' +
+                escHtml(f) + '</span></div>';
+        }).join('');
+    }
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function renderAI(data) {
+        var isFake     = (data.verdict || '').toUpperCase() === 'FAKE';
+        var conf       = parseInt(data.confidence) || 0;
+        var cls        = isFake ? 'fake' : 'genuine';
+        var verdictLbl = isFake ? '⚠️ FAKE' : '✅ GENUINE';
+        var html = '';
+        // Verdict pill + confidence text
+        html += '<div class="ai-verdict-row">';
+        html += '<span class="ai-verdict-pill ' + cls + '">' + verdictLbl + '</span>';
+        html += '<span class="ai-conf-text">AI Confidence: <span>' + conf + '%</span></span>';
+        html += '</div>';
+        // Confidence bar
+        html += '<div class="ai-conf-bar-wrap">';
+        html += '<div class="ai-conf-bar-label"><span>' + (isFake ? 'Fake' : 'Genuine') + ' Confidence</span><span>' + conf + '%</span></div>';
+        html += '<div class="ai-conf-track"><div class="ai-conf-fill ' + cls + '" id="aiConfFill" data-w="' + conf + '"></div></div>';
+        html += '</div>';
+        // Reason
+        if (data.reason) {
+            html += '<div class="ai-reason"><i class="fa fa-comment-dots" style="color:#6366f1;margin-right:7px;"></i>' + escHtml(data.reason) + '</div>';
+        }
+        // Flags grid
+        html += '<div class="ai-flags-row">';
+        html += '<div class="ai-flags-box red"><div class="ai-flags-title"><i class="fa fa-exclamation-circle"></i> Red Flags</div>' + renderFlags(data.red_flags, 'red') + '</div>';
+        html += '<div class="ai-flags-box green"><div class="ai-flags-title"><i class="fa fa-check-circle"></i> Positive Indicators</div>' + renderFlags(data.green_flags, 'green') + '</div>';
+        html += '</div>';
+
+        return html;
+    }
+    // Call Flask AI endpoint
+    fetch('/api/ai-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ review: reviewText })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+        aiLoading.style.display = 'none';
+        if (data.error) {
+            aiResult.innerHTML = '<div class="ai-error"><i class="fa fa-exclamation-triangle" style="margin-right:8px;"></i>' +
+                '<strong>Analysis Unavailable:</strong> ' + escHtml(data.error) +
+                '<br><small style="opacity:.7;margin-top:6px;display:block;">Set the environment variable to enable analysis.</small></div>';
+        } else {
+            aiResult.innerHTML = renderAI(data);
+            // Animate confidence bar after render
+            setTimeout(function () {
+                var fill = document.getElementById('aiConfFill');
+                if (fill) fill.style.width = fill.getAttribute('data-w') + '%';
+            }, 100);
+        }
+        aiResult.style.display = 'block';
+    })
+    .catch(function (err) {
+        aiLoading.style.display = 'none';
+        aiResult.innerHTML = '<div class="ai-error"><i class="fa fa-wifi" style="margin-right:8px;"></i>Could not reach the service. Please try again.</div>';
+        aiResult.style.display = 'block';
+    });
+})();
+</script>
+</body>
+</html>

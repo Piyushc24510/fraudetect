@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root[data-theme="dark"] {
+            --bg-body: #0a0a0a;
+            --bg-card: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent: #00ff99;
+            --accent-hover: #00cc7a;
+            --border-color: #333333;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .register-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 30px rgba(0, 255, 153, 0.15);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo i {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        h2 {
+            text-align: center;
+            color: var(--accent);
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert.error {
+            background: rgba(255, 77, 77, 0.15);
+            border: 1px solid rgba(255, 77, 77, 0.4);
+            color: #ff6b6b;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 16px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 153, 0.2);
+        }
+        input::placeholder { color: #555; }
+        .hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 153, 0.4);
+        }
+        button i { margin-right: 8px; }
+        .links {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .links a:hover { color: var(--accent-hover); }
+        .terms {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        @media (max-width: 480px) {
+            .register-container { padding: 30px 24px; }
+            h2 { font-size: 24px; }
+            .logo i { font-size: 40px; }
+            input { font-size: 16px; }
+            .form-group { margin-bottom: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <i class="fa fa-user-plus"></i>
+            <h2>Admin Registration</h2>
+            <div class="subtitle">Create New Admin Account</div>
+        </div>
+        {% if error %}
+        <div class="alert error">
+            <i class="fa fa-exclamation-circle"></i>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+        <form method="POST">
+            <div class="form-group">
+                <label><i class="fa fa-user"></i> Full Name</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-user"></i>
+                    <input type="text" name="name" placeholder="Enter your full name" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fa fa-id-card"></i> Username</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-id-card"></i>
+                    <input type="text" name="username" placeholder="Choose a username" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fa fa-lock"></i> Password</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" name="password" placeholder="Create a password" required>
+                </div>
+                <div class="hint">
+                    <i class="fa fa-info-circle"></i>
+                    <span>Password must be at least 6 characters</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fa fa-lock"></i> Confirm Password</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" name="confirm_password" placeholder="Re-enter your password" required>
+                </div>
+            </div>
+            <button type="submit">
+                <i class="fa fa-check-circle"></i> Register Account
+            </button>
+        </form>
+        <div class="links">
+            <a href="/login"><i class="fa fa-sign-in-alt"></i> Already have an account? Login</a>
+        </div>
+        <div class="terms">
+            By registering, you agree to our Terms of Service and Privacy Policy
+        </div>
+    </div>
+</body>
+</html>

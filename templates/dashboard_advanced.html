@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 200, 100, 0.3);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            padding: 30px 20px;
+            box-shadow: 4px 0 15px var(--shadow-sidebar);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+            color: var(--accent);
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .side-btn {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .side-btn i {
+            margin-right: 12px;
+            color: var(--accent);
+        }
+
+        .side-btn:hover {
+            background: rgba(0, 255, 153, 0.1);
+            padding-left: 25px;
+        }
+
+        .side-btn.active {
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .side-btn.active i {
+            color: #000;
+        }
+
+        .logout-link {
+            display: block;
+            margin-top: 30px;
+            padding: 15px 20px;
+            color: #ff4d4d;
+            text-decoration: none;
+            font-size: 16px;
+            border-top: 1px solid var(--border-sidebar);
+        }
+
+        .main {
+            margin-left: 260px;
+            padding: 40px;
+            min-height: 100vh;
+            background: var(--bg-main);
+            transition: margin-left 0.3s ease, background 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg-header);
+            border-radius: 10px;
+        }
+
+        .header h1 {
+            color: var(--accent);
+            font-size: 28px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 153, 0.4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .stat-card.fake i {
+            color: #ff4d4d;
+        }
+
+        .stat-card h3 {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .stat-card.fake .number {
+            color: #ff4d4d;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel h3 {
+            color: var(--accent);
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel h3 i {
+            margin-right: 10px;
+        }
+
+        /* Word Cloud */
+        .word-cloud-container {
+            width: 100%;
+            height: 300px;
+            background: var(--bg-wc);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .word-cloud-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Live Activity Feed */
+        .live-feed {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) var(--scrollbar-track);
+        }
+
+        .live-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .live-feed::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        .live-feed::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .activity-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: var(--bg-activity);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .activity-item.new {
+            border-left: 4px solid var(--accent);
+            background: rgba(0, 255, 153, 0.05);
+        }
+
+        .activity-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .activity-badge.fake {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .activity-badge.genuine {
+            background: #00ff99;
+            color: black;
+        }
+
+        .time-ago {
+            font-size: 11px;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        /* User Activity Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .user-table th {
+            background: var(--th-bg);
+            padding: 12px;
+            text-align: left;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .user-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-table tr:hover {
+            background: rgba(0, 255, 153, 0.05);
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .rank-1 {
+            background: gold;
+            color: black;
+        }
+
+        .rank-2 {
+            background: silver;
+            color: black;
+        }
+
+        .rank-3 {
+            background: #cd7f32;
+            color: white;
+        }
+
+        /* Personal Stats */
+        .personal-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .mini-stat {
+            background: var(--bg-mini);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .mini-stat .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .mini-stat .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Auto-refresh indicator */
+        .refresh-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 153, 0.15);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            font-size: 12px;
+            display: none;
+            backdrop-filter: blur(5px);
+            z-index: 1001;
+        }
+
+        .refresh-indicator.active {
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Loading States */
+        .skeleton-loader {
+            padding: 20px;
+        }
+
+        .skeleton-line {
+            height: 20px;
+            background: linear-gradient(90deg, var(--skeleton-a) 25%, var(--skeleton-b) 50%, var(--skeleton-a) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 77, 77, 0.1);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .no-data {
+            color: var(--text-muted);
+            padding: 40px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Show hamburger */
+            .menu-toggle { display: flex !important; }
+
+            /* Sidebar: hidden off-screen by default */
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 1050;
+            }
+            /* Sidebar open state */
+            .sidebar.active { transform: translateX(0); }
+
+            /* Push content down below hamburger */
+            .main {
+                margin-left: 0 !important;
+                padding: 70px 15px 20px !important;
+            }
+
+            /* Collapse multi-col grids */
+            .stats-grid,
+            .stats-summary,
+            .personal-grid,
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* History table stack */
+            .history-header,
+            .history-item {
+                grid-template-columns: 1fr !important;
+                gap: 4px;
+            }
+
+            /* Date filter stack */
+            .date-filter {
+                flex-direction: column !important;
+                gap: 12px;
+            }
+            .date-filter > div { width: 100% !important; }
+
+            /* Header flex stack */
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+            .export-buttons {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            h2 { font-size: 22px !important; }
+            h1 { font-size: 20px !important; }
+        }
+
+        
+            .stat-card, .stat-box, .mini-stat { padding: 16px 10px; }
+            .export-btn { font-size: 12px; padding: 7px 12px; }
+            .theme-pill { padding: 8px 12px; }
+        
+
+        
+
+            .export-buttons {
+                flex-direction: column;
+            }
+
+            .export-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        
+        
+
+
+        /* ════════════════ THEME VARIABLES ════════════════ */
+        :root[data-theme="dark"] {
+            --bg-body:        #0a0a0a;
+            --bg-main:        linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%);
+            --bg-sidebar:     linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%);
+            --bg-panel:       linear-gradient(135deg,#1e1e1e 0%,#2a2a2a 100%);
+            --bg-card:        linear-gradient(135deg,#1e1e1e 0%,#2a2a2a 100%);
+            --bg-header:      linear-gradient(135deg,#1e1e1e 0%,#2a2a2a 100%);
+            --bg-row:         #1a1a1a;
+            --bg-mini:        #1a1a1a;
+            --bg-wc:          #1a1a1a;
+            --bg-activity:    #1a1a1a;
+            --text-primary:   #ffffff;
+            --text-secondary: #888888;
+            --text-muted:     #666666;
+            --border-color:   #333333;
+            --border-sidebar: #404040;
+            --accent:         #00ff99;
+            --accent-hover:   #00cc7a;
+            --shadow-sidebar: rgba(0,255,153,0.1);
+            --chart-grid:     #333333;
+            --chart-tick:     #888888;
+            --chart-legend:   #ffffff;
+            --th-bg:          #1a1a1a;
+            --skeleton-a:     #2a2a2a;
+            --skeleton-b:     #3a3a3a;
+            --scrollbar-track:#1a1a1a;
+        }
+        :root[data-theme="light"] {
+            --bg-body:        #f0f2f5;
+            --bg-main:        linear-gradient(135deg,#f0f2f5 0%,#e8eaf0 100%);
+            --bg-sidebar:     linear-gradient(135deg,#ffffff 0%,#f5f5f5 100%);
+            --bg-panel:       linear-gradient(135deg,#ffffff 0%,#f8f8f8 100%);
+            --bg-card:        linear-gradient(135deg,#ffffff 0%,#f8f8f8 100%);
+            --bg-header:      linear-gradient(135deg,#ffffff 0%,#f5f5f5 100%);
+            --bg-row:         #f5f5f5;
+            --bg-mini:        #f0f0f0;
+            --bg-wc:          #eeeeee;
+            --bg-activity:    #f5f5f5;
+            --text-primary:   #1a1a1a;
+            --text-secondary: #555555;
+            --text-muted:     #888888;
+            --border-color:   #dddddd;
+            --border-sidebar: #dddddd;
+            --accent:         #00aa66;
+            --accent-hover:   #008855;
+            --shadow-sidebar: rgba(0,0,0,0.08);
+            --chart-grid:     #e0e0e0;
+            --chart-tick:     #555555;
+            --chart-legend:   #1a1a1a;
+            --th-bg:          #eeeeee;
+            --skeleton-a:     #e8e8e8;
+            --skeleton-b:     #f5f5f5;
+            --scrollbar-track:#eeeeee;
+        }
+        body,
+        .sidebar,.main,.header,.stat-card,.panel,
+        .mini-stat,.activity-item,.user-table th,
+        .user-table td,.word-cloud-container { transition:background 0.3s ease,color 0.3s ease,border-color 0.3s ease; }
+
+        /* ════════════════ THEME TOGGLE PILL ════════════════ */
+        .theme-pill {
+            display:flex;align-items:center;justify-content:space-between;
+            gap:10px;padding:10px 14px;margin-bottom:18px;
+            background:var(--toggle-bg,rgba(0,0,0,0.25));
+            border:1px solid var(--toggle-border,rgba(0,255,153,0.25));
+            border-radius:50px;cursor:pointer;
+            transition:all 0.3s ease;width:100%;user-select:none;
+        }
+        .theme-pill:hover { background:rgba(0,255,153,0.12); border-color:var(--accent); transform:scale(1.02); }
+        .theme-pill .pill-labels { display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-primary);letter-spacing:0.4px; }
+        .theme-pill .pill-labels i { font-size:14px;color:var(--accent); }
+        .theme-pill .pill-track { position:relative;width:42px;height:22px;background:var(--track-bg,#333);border-radius:11px;flex-shrink:0;transition:background 0.3s ease; }
+        .theme-pill .pill-thumb { position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--accent);transition:transform 0.3s ease,background 0.3s ease;box-shadow:0 0 8px rgba(0,255,153,0.6); }
+        [data-theme="light"] .theme-pill .pill-thumb { transform:translateX(20px);background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,0.6); }
+        [data-theme="light"] .theme-pill .pill-track { background:#e5e7eb; }
+        [data-theme="light"] .theme-pill { --toggle-bg:rgba(255,255,255,0.9);--toggle-border:rgba(0,180,100,0.3); }
+        /* ═══════════════════════════════════════════════════ */
+
+        /* Mobile overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 768px) {
+            .main { padding-top: 70px; }
+        }
+        /* ══════ NEW SIDEBAR ══════ */
+        .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:1200;background:#00ff99;color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
+        .overlay-new{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1100;}
+        .overlay-new.show{display:block;}
+        .sidebar-new{position:fixed;left:0;top:0;width:260px;height:100vh;background:#161b22;border-right:1px solid #30363d;padding:28px 18px;z-index:1150;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+        .logo-area{text-align:center;margin-bottom:28px;}
+        .logo-area .icon{font-size:38px;color:#00ff99;}
+        .logo-area h3{font-size:16px;color:#00ff99;margin-top:8px;letter-spacing:1px;}
+        .logo-area small{font-size:11px;color:#8b949e;}
+        .theme-toggle{width:100%;padding:10px;background:rgba(0,255,153,0.08);border:1px solid #00ff99;color:#00ff99;border-radius:8px;cursor:pointer;margin-bottom:15px;font-size:13px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+        .theme-toggle:hover{background:rgba(0,255,153,0.15);}
+        [data-theme="light"] .theme-toggle{border-color:#00884d;color:#00884d;background:rgba(0,136,77,0.08);}
+        [data-theme="light"] .theme-toggle:hover{background:rgba(0,136,77,0.15);}
+        [data-theme="light"] .sidebar-new{background:#ffffff;border-right:1px solid #d0d7de;}
+        [data-theme="light"] .logo-area .icon,[data-theme="light"] .logo-area h3{color:#00884d;}
+        [data-theme="light"] .logo-area small{color:#57606a;}
+        [data-theme="light"] .nav-link{color:#57606a;}
+        [data-theme="light"] .nav-link:hover{background:rgba(0,136,77,0.09);color:#00884d;}
+        [data-theme="light"] .nav-link.active{background:rgba(0,136,77,0.14);color:#00884d;}
+        [data-theme="light"] .divider-new{background:#d0d7de;}
+        [data-theme="light"] .user-card-new{background:rgba(0,136,77,0.06);border-color:rgba(0,136,77,0.18);}
+        [data-theme="light"] .uname-new i{color:#00884d;}
+        [data-theme="light"] .role-pill-new{background:rgba(0,136,77,0.15);color:#00884d;}
+        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:#8b949e;text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
+        .nav-link i{width:17px;text-align:center;}
+        .nav-link:hover{background:rgba(0,255,153,0.09);color:#00ff99;}
+        .nav-link.active{background:rgba(0,255,153,0.14);color:#00ff99;font-weight:600;}
+        .divider-new{height:1px;background:#30363d;margin:10px 0;}
+        .bottom-area-new{margin-top:auto;}
+        .user-card-new{background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.18);border-radius:10px;padding:13px;margin-bottom:10px;}
+        .uname-new{font-size:13px;font-weight:600;}
+        .uname-new i{color:#00ff99;margin-right:6px;}
+        .role-pill-new{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:#00ff99;margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
+        .logout-btn-new{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
+        .logout-btn-new:hover{background:rgba(255,85,85,0.1);}
+        @media(max-width:860px){.sidebar-new{transform:translateX(-100%);transition:transform 0.3s;}.sidebar-new.open{transform:translateX(0);}.mob-menu{display:flex!important;}.main{margin-left:0!important;padding-top:60px!important;}}
+
+        /* ── Hourly Activity Heatmap ── */
+        .heatmap-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .heatmap-panel h3 {
+            color: var(--accent);
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        .heatmap-subtitle {
+            font-size: 12px;
+            color: var(--text-muted, #8b949e);
+            margin-bottom: 22px;
+        }
+        .heatmap-wrap {
+            overflow-x: auto;
+        }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: 52px repeat(24, 1fr);
+            gap: 3px;
+            min-width: 620px;
+        }
+        .hm-corner { width: 52px; }
+        .hm-hour-label {
+            font-size: 10px;
+            color: var(--text-muted, #8b949e);
+            text-align: center;
+            padding-bottom: 6px;
+            font-weight: 500;
+        }
+        .hm-day-label {
+            font-size: 11px;
+            color: var(--text-muted, #8b949e);
+            display: flex;
+            align-items: center;
+            padding-right: 8px;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .hm-cell {
+            height: 26px;
+            border-radius: 4px;
+            background: var(--hm-empty, rgba(255,255,255,0.04));
+            cursor: pointer;
+            transition: transform 0.15s, opacity 0.15s;
+            position: relative;
+        }
+        .hm-cell:hover { transform: scale(1.25); z-index: 10; }
+        .hm-cell[data-tip]:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1c1c1c;
+            color: #e6edf3;
+            font-size: 11px;
+            white-space: nowrap;
+            padding: 4px 8px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            pointer-events: none;
+            z-index: 99;
+        }
+        [data-theme="light"] .hm-cell[data-tip]:hover::after {
+            background: #fff;
+            color: #1a1a2e;
+            border-color: #ccc;
+        }
+        [data-theme="light"] .hm-cell {
+            --hm-empty: rgba(0,0,0,0.05);
+        }
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            font-size: 11px;
+            color: var(--text-muted, #8b949e);
+            justify-content: flex-end;
+        }
+        .hm-leg-cell {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <button class="mob-menu" id="menuBtn" onclick="toggleSidebarNew()"><i class="fa fa-bars"></i></button>
+    <div class="overlay-new" id="overlayNew" onclick="toggleSidebarNew()"></div>
+
+    <aside class="sidebar-new" id="sidebar">
+        <div class="logo-area">
+            <i class="fa fa-shield-alt icon"></i>
+            <h3>FraudDetect</h3>
+            <small>Review Analysis System</small>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <i class="fa fa-moon" id="themeIcon"></i>
+            <span id="themeText">Dark Mode</span>
+        </button>
+        <a href="/dashboard" class="nav-link active"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/check"     class="nav-link"><i class="fa fa-search"></i> Check Review</a>
+        <a href="/history"   class="nav-link"><i class="fa fa-history"></i> History</a>
+        {% if user_role == 'admin' %}
+        <a href="/analytics" class="nav-link"><i class="fa fa-chart-line"></i> Analytics</a>
+        <a href="/users"     class="nav-link"><i class="fa fa-users"></i> User Management</a>
+        {% endif %}
+        <div class="divider-new"></div>
+        <div class="bottom-area-new">
+            <div class="user-card-new">
+                <div class="uname-new"><i class="fa fa-user-circle"></i>{{ user_name if user_name else "Admin" }}</div>
+                <span class="role-pill-new">{{ user_role if user_role else "admin" }}</span>
+            </div>
+            <a href="/logout" class="logout-btn-new"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </aside>
+
+    <div class="main">
+        <!-- Header with Export Buttons -->
+        <div class="header">
+            <div>
+                <h1><i class="fa fa-tachometer-alt"></i> Advanced Dashboard</h1>
+                <p style="color: #888;">Real-time fraud detection analytics</p>
+            </div>
+            <div class="export-buttons">
+                <a href="/export/csv" class="export-btn" aria-label="Export as CSV">
+                    <i class="fa fa-file-csv"></i> CSV
+                </a>
+                <a href="/export/excel" class="export-btn" aria-label="Export as Excel">
+                    <i class="fa fa-file-excel"></i> Excel
+                </a>
+                <a href="/export/pdf" class="export-btn" aria-label="Export as PDF">
+                    <i class="fa fa-file-pdf"></i> PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Auto-refresh indicator -->
+        <div id="refreshIndicator" class="refresh-indicator" role="status" aria-live="polite">
+            <i class="fa fa-sync fa-spin"></i> Live updating...
+        </div>
+
+        <!-- Main Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card" role="region" aria-label="Total reviews statistic">
+                <i class="fa fa-file-alt"></i>
+                <h3>Total Reviews</h3>
+                <div class="number" id="totalCount">{% if total %}{{ total }}{% else %}0{% endif %}</div>
+            </div>
+            <div class="stat-card fake" role="region" aria-label="Fake reviews statistic">
+                <i class="fa fa-exclamation-triangle"></i>
+                <h3>Fake Detected</h3>
+                <div class="number" id="fakeCount">{% if fake %}{{ fake }}{% else %}0{% endif %}</div>
+            </div>
+            <div class="stat-card" role="region" aria-label="Genuine reviews statistic">
+                <i class="fa fa-check-circle"></i>
+                <h3>Genuine</h3>
+                <div class="number" id="genuineCount">{% if genuine %}{{ genuine }}{% else %}0{% endif %}</div>
+            </div>
+            <div class="stat-card" role="region" aria-label="Fake rate statistic">
+                <i class="fa fa-percent"></i>
+                <h3>Fake Rate</h3>
+                <div class="number" id="fakePercent">{% if fake_percent %}{{ fake_percent }}{% else %}0{% endif %}%</div>
+            </div>
+        </div>
+
+        <!-- Personal Stats -->
+        <div class="panel" style="margin-bottom: 30px;">
+            <h3><i class="fa fa-user"></i> Your Personal Stats</h3>
+            {% if personal_stats %}
+            <div class="personal-grid">
+                <div class="mini-stat">
+                    <div class="value">{% if personal_stats.total %}{{ personal_stats.total }}{% else %}0{% endif %}</div>
+                    <div class="label">Reviews Checked</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="value">{% if personal_stats.fake %}{{ personal_stats.fake }}{% else %}0{% endif %}</div>
+                    <div class="label">Fakes Found</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="value">{% if personal_stats.genuine %}{{ personal_stats.genuine }}{% else %}0{% endif %}</div>
+                    <div class="label">Genuine Found</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="value">
+                        {% if personal_stats.total and personal_stats.total > 0 and personal_stats.fake %}
+                            {{ "%.1f"|format((personal_stats.fake / personal_stats.total * 100)) }}%
+                        {% else %}0.0%{% endif %}
+                    </div>
+                    <div class="label">Detection Rate</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-data">No personal stats available yet. Start checking reviews to see your statistics.</div>
+            {% endif %}
+        </div>
+
+        <!-- Hourly Activity Heatmap -->
+        <div class="heatmap-panel">
+            <h3><i class="fa fa-th"></i> Hourly Activity Heatmap</h3>
+            <div class="heatmap-subtitle">Reviews checked per hour, by day of week</div>
+            <div class="heatmap-wrap">
+                <div class="heatmap-grid" id="heatmapGrid">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+            <div class="heatmap-legend">
+                <span>Less</span>
+                <div class="hm-leg-cell" style="background:rgba(0,255,153,0.08)"></div>
+                <div class="hm-leg-cell" style="background:rgba(0,255,153,0.22)"></div>
+                <div class="hm-leg-cell" style="background:rgba(0,255,153,0.42)"></div>
+                <div class="hm-leg-cell" style="background:rgba(0,255,153,0.65)"></div>
+                <div class="hm-leg-cell" style="background:rgba(0,255,153,0.88)"></div>
+                <span>More</span>
+            </div>
+        </div>
+
+        <!-- Live Activity Feed -->
+        <div class="panel" style="margin-bottom: 30px;">
+            <h3>
+                <i class="fa fa-broadcast-tower"></i> Live Activity Feed
+                <span style="font-size: 12px; color: #888; font-weight: normal; margin-left: 10px;">
+                    (Updates every 5 seconds)
+                </span>
+            </h3>
+            <div class="live-feed" id="liveFeed">
+                {% if history %}
+                    {% for item in history[:10] %}
+                    <div class="activity-item">
+                        <div>
+                            <strong>{% if item.review %}{{ item.review|truncate(50) }}{% else %}No review text{% endif %}</strong>
+                            <span class="time-ago">{% if item.timestamp %}{{ item.timestamp }}{% else %}Just now{% endif %}</span>
+                        </div>
+                        <div>
+                            <span class="activity-badge {% if item.is_fake %}fake{% else %}genuine{% endif %}">
+                                {% if item.is_fake %}FAKE{% else %}GENUINE{% endif %}
+                            </span>
+                            <span style="color: #888; margin-left: 10px;">{% if item.confidence %}{{ item.confidence }}{% else %}0{% endif %}%</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-data">No recent activity. Start checking reviews to see live feed.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Activity Tracking -->
+        <div class="panel">
+            <h3><i class="fa fa-users"></i> User Activity Leaderboard</h3>
+            <div class="table-responsive">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>User</th>
+                            <th>Total Checks</th>
+                            <th>Fake Found</th>
+                            <th>Genuine Found</th>
+                            <th>Detection Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if user_stats %}
+                            {% set sorted_users = user_stats.items()|sort(attribute='1.total', reverse=True) %}
+                            {% for user, stats in sorted_users %}
+                            <tr>
+                                <td>
+                                    {% if loop.index == 1 %}
+                                    <span class="rank-badge rank-1" aria-label="Rank 1">🥇 #1</span>
+                                    {% elif loop.index == 2 %}
+                                    <span class="rank-badge rank-2" aria-label="Rank 2">🥈 #2</span>
+                                    {% elif loop.index == 3 %}
+                                    <span class="rank-badge rank-3" aria-label="Rank 3">🥉 #3</span>
+                                    {% else %}
+                                    #{{ loop.index }}
+                                    {% endif %}
+                                </td>
+                                <td><strong>{{ user }}</strong></td>
+                                <td>{% if stats.total %}{{ stats.total }}{% else %}0{% endif %}</td>
+                                <td style="color: #ff4d4d;">{% if stats.fake %}{{ stats.fake }}{% else %}0{% endif %}</td>
+                                <td style="color: #00ff99;">{% if stats.genuine %}{{ stats.genuine }}{% else %}0{% endif %}</td>
+                                <td>{% if stats.total and stats.total > 0 and stats.fake %}{{ "%.1f"|format((stats.fake / stats.total * 100)) }}{% else %}0.0{% endif %}%</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="no-data">No user data available</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        var CONFIG = {
+            refreshInterval: 5000,
+            retryAttempts: 3,
+            retryDelay: 2000,
+            wordCloudWeightFactor: 3,
+            chartColors: {
+                fake: '#ff4d4d',
+                genuine: '#00ff99',
+                background: '#1a1a1a'
+            }
+        };
+
+        /* ══════════ MOBILE SIDEBAR ══════════ */
+        (function () {
+            var toggle  = document.getElementById('menuToggle');
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+
+            if (!toggle || !sidebar) return;
+
+            function openSidebar() {
+                sidebar.classList.add('active');
+                if (overlay) overlay.classList.add('active');
+                toggle.querySelector('i').className = 'fa fa-times';
+                document.body.style.overflow = 'hidden';
+            }
+            function closeSidebar() {
+                sidebar.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+                toggle.querySelector('i').className = 'fa fa-bars';
+                document.body.style.overflow = '';
+            }
+
+            toggle.addEventListener('click', function () {
+                sidebar.classList.contains('active') ? closeSidebar() : openSidebar();
+            });
+
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            sidebar.querySelectorAll('a').forEach(function (a) {
+                a.addEventListener('click', function () {
+                    if (window.innerWidth <= 768) closeSidebar();
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) closeSidebar();
+            });
+        })();
+        /* ═══════════════════════════════════ */
+        
+
+        // Safe JSON parsing function
+        function safeJSONParse(data, defaultValue) {
+            if (defaultValue === undefined) defaultValue = [];
+            if (!data) return defaultValue;
+            try {
+                return typeof data === 'string' ? JSON.parse(data) : data;
+            } catch (e) {
+                console.error('JSON Parse Error:', e);
+                return defaultValue;
+            }
+        }
+
+        // ── Hourly Activity Heatmap ──────────────────────────────────────
+        (function () {
+            var DAYS  = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            var HOURS = Array.from({length: 24}, function(_, i) {
+                return i === 0 ? '12a' : i < 12 ? i + 'a' : i === 12 ? '12p' : (i - 12) + 'p';
+            });
+
+            // Build a 7×24 matrix from history data passed via the live-activity API
+            // Falls back to zeros if no data yet
+            var matrix = Array.from({length: 7}, function() {
+                return Array(24).fill(0);
+            });
+
+            function fillMatrix(activity) {
+                // Reset
+                for (var d = 0; d < 7; d++) matrix[d] = Array(24).fill(0);
+                (activity || []).forEach(function(item) {
+                    if (!item.timestamp) return;
+                    var dt = new Date(item.timestamp.replace(' ', 'T'));
+                    if (isNaN(dt)) return;
+                    var day  = (dt.getDay() + 6) % 7; // Mon=0 … Sun=6
+                    var hour = dt.getHours();
+                    matrix[day][hour]++;
+                });
+            }
+
+            function renderHeatmap() {
+                var grid = document.getElementById('heatmapGrid');
+                if (!grid) return;
+
+                var maxVal = 1;
+                matrix.forEach(function(row) {
+                    row.forEach(function(v) { if (v > maxVal) maxVal = v; });
+                });
+
+                var html = '';
+
+                // Header row: corner + hour labels
+                html += '<div class="hm-corner"></div>';
+                HOURS.forEach(function(h) {
+                    html += '<div class="hm-hour-label">' + h + '</div>';
+                });
+
+                // Data rows
+                DAYS.forEach(function(day, di) {
+                    html += '<div class="hm-day-label">' + day + '</div>';
+                    for (var h = 0; h < 24; h++) {
+                        var val     = matrix[di][h];
+                        var ratio   = val / maxVal;
+                        var opacity = val === 0 ? 0.04 : 0.1 + ratio * 0.88;
+                        var tip     = day + ' ' + HOURS[h] + ': ' + val + ' review' + (val !== 1 ? 's' : '');
+                        html += '<div class="hm-cell" data-tip="' + tip + '" ' +
+                                'style="background:rgba(0,255,153,' + opacity.toFixed(2) + ')"></div>';
+                    }
+                });
+
+                grid.innerHTML = html;
+            }
+
+            // Initial render (empty or with server-side data)
+            renderHeatmap();
+
+            // Refresh whenever live-activity updates
+            var _origUpdateLiveFeed;
+            document.addEventListener('DOMContentLoaded', function () {
+                // Patch updateLiveFeed to also refresh heatmap
+                var origFn = window.updateLiveFeed;
+                if (typeof origFn === 'function') {
+                    window.updateLiveFeed = async function () {
+                        await origFn.apply(this, arguments);
+                    };
+                }
+
+                // Fetch full history once to populate heatmap properly
+                fetch('/api/live-activity?limit=500')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data && data.activity) {
+                            fillMatrix(data.activity);
+                            renderHeatmap();
+                        }
+                    })
+                    .catch(function() {});
+
+                // Re-fetch heatmap data every 30s
+                setInterval(function () {
+                    fetch('/api/live-activity?limit=500')
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data && data.activity) {
+                                fillMatrix(data.activity);
+                                renderHeatmap();
+                            }
+                        })
+                        .catch(function() {});
+                }, 30000);
+            });
+        })();
+        // ────────────────────────────────────────────────────────────────
+
+        // Live Activity Feed with retry logic
+        var lastActivityCount = parseInt(document.getElementById('totalCount')?.textContent || '0');
+        var retryCount = 0;
+        var isRefreshing = false;
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function updateStats(stats) {
+            var totalEl = document.getElementById('totalCount');
+            var fakeEl = document.getElementById('fakeCount');
+            var genuineEl = document.getElementById('genuineCount');
+            var percentEl = document.getElementById('fakePercent');
+            
+            if (totalEl) totalEl.textContent = stats.total || 0;
+            if (fakeEl) fakeEl.textContent = stats.fake || 0;
+            if (genuineEl) genuineEl.textContent = stats.genuine || 0;
+            if (percentEl) percentEl.textContent = (stats.fake_percent || 0) + '%';
+        }
+
+        async function updateLiveFeed() {
+            if (isRefreshing) return;
+            
+            try {
+                isRefreshing = true;
+                var response = await fetch('/api/live-activity?limit=10');
+                
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                
+                var data = await response.json();
+                
+                if (data.total > lastActivityCount) {
+                    // Show refresh indicator
+                    var indicator = document.getElementById('refreshIndicator');
+                    if (indicator) indicator.classList.add('active');
+                    
+                    // Update counts
+                    lastActivityCount = data.total;
+                    
+                    // Update main stats if available
+                    if (data.stats) {
+                        updateStats(data.stats);
+                    }
+                    
+                    // Update feed
+                    var feedHTML = '';
+                    if (data.activity && data.activity.length > 0) {
+                        feedHTML = data.activity.map(function(item) {
+                            return '<div class="activity-item new">' +
+                                '<div>' +
+                                    '<strong>' + escapeHTML(item.review || 'No review text').substring(0, 50) + '</strong>' +
+                                    '<span class="time-ago">' + escapeHTML(item.timestamp || 'Just now') + '</span>' +
+                                '</div>' +
+                                '<div>' +
+                                    '<span class="activity-badge ' + (item.is_fake ? 'fake' : 'genuine') + '">' +
+                                        (item.is_fake ? 'FAKE' : 'GENUINE') +
+                                    '</span>' +
+                                    '<span style="color: #888; margin-left: 10px;">' + (item.confidence || 0) + '%</span>' +
+                                '</div>' +
+                            '</div>';
+                        }).join('');
+                    } else {
+                        feedHTML = '<div class="no-data">No recent activity</div>';
+                    }
+                    
+                    var liveFeed = document.getElementById('liveFeed');
+                    if (liveFeed) {
+                        liveFeed.innerHTML = feedHTML;
+                    }
+                    
+                    // Hide indicator after 2 seconds
+                    setTimeout(function() {
+                        var indicator = document.getElementById('refreshIndicator');
+                        if (indicator) indicator.classList.remove('active');
+                    }, 2000);
+                    
+                    retryCount = 0; // Reset retry count on success
+                }
+            } catch (error) {
+                console.error('Error fetching live activity:', error);
+                
+                retryCount++;
+                if (retryCount <= CONFIG.retryAttempts) {
+                    setTimeout(updateLiveFeed, CONFIG.retryDelay);
+                } else {
+                    var liveFeed = document.getElementById('liveFeed');
+                    if (liveFeed) {
+                        liveFeed.innerHTML = '<div class="error-message">Failed to load live feed. Please refresh the page.</div>';
+                    }
+                }
+            } finally {
+                isRefreshing = false;
+            }
+        }
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up live feed refresh
+            setInterval(updateLiveFeed, CONFIG.refreshInterval);
+        });
+
+    </script>
+
+    <script>
+    /* ════════ THEME ENGINE ════════ */
+    (function(){
+        var s=localStorage.getItem('appTheme')||'dark';
+        document.documentElement.setAttribute('data-theme',s);
+    })();
+    function updateThemeButton(theme){
+        var icon=document.getElementById('themeIcon');
+        var text=document.getElementById('themeText');
+        if(!icon||!text)return;
+        if(theme==='dark'){ icon.className='fa fa-sun'; text.textContent='Light Mode'; }
+        else              { icon.className='fa fa-moon';text.textContent='Dark Mode';  }
+    }
+    function toggleTheme(){
+        var cur=document.documentElement.getAttribute('data-theme')||'dark';
+        var next=cur==='dark'?'light':'dark';
+        document.documentElement.setAttribute('data-theme',next);
+        localStorage.setItem('appTheme',next);
+        updateThemeButton(next);
+        if(typeof updateChartsForTheme==='function') updateChartsForTheme();
+    }
+    /* Chart color update helper (chart instances stored in chartInstances obj) */
+    var chartInstances={};
+    function getChartColors(){
+        var dark=document.documentElement.getAttribute('data-theme')==='dark';
+        return { grid:dark?'#333':'#e0e0e0', tick:dark?'#888':'#555', legend:dark?'#fff':'#1a1a1a' };
+    }
+    function updateChartsForTheme(){
+        var c=getChartColors();
+        Object.values(chartInstances).forEach(function(chart){
+            if(!chart)return;
+            if(chart.options.plugins&&chart.options.plugins.legend)
+                chart.options.plugins.legend.labels.color=c.legend;
+            if(chart.options.scales){
+                ['x','y'].forEach(function(ax){
+                    if(chart.options.scales[ax]){
+                        if(chart.options.scales[ax].grid) chart.options.scales[ax].grid.color=c.grid;
+                        if(chart.options.scales[ax].ticks) chart.options.scales[ax].ticks.color=c.tick;
+                    }
+                });
+            }
+            chart.update('none');
+        });
+    }
+    document.addEventListener('DOMContentLoaded',function(){
+        updateThemeButton(localStorage.getItem('appTheme')||'dark');
+    });
+    /* ═══════════════════════════════ */
+    </script>
+
+    <script>
+    /* ══════════ MOBILE SIDEBAR ══════════ */
+    (function () {
+        var toggle  = document.getElementById('menuToggle');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (!toggle || !sidebar) return;
+
+        function openSidebar() {
+            sidebar.classList.add('active');
+            if (overlay) overlay.classList.add('active');
+            toggle.querySelector('i').className = 'fa fa-times';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            toggle.querySelector('i').className = 'fa fa-bars';
+            document.body.style.overflow = '';
+        }
+
+        toggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            sidebar.classList.contains('active') ? closeSidebar() : openSidebar();
+        });
+
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+
+        /* Close on nav-link tap */
+        sidebar.querySelectorAll('a').forEach(function (a) {
+            a.addEventListener('click', function () {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+        });
+
+        /* Close on swipe left */
+        var touchStartX = 0;
+        sidebar.addEventListener('touchstart', function (e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        sidebar.addEventListener('touchend', function (e) {
+            if (touchStartX - e.changedTouches[0].screenX > 60) closeSidebar();
+        }, { passive: true });
+
+        /* Swipe right from edge to open */
+        document.addEventListener('touchstart', function (e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        document.addEventListener('touchend', function (e) {
+            var dx = e.changedTouches[0].screenX - touchStartX;
+            if (touchStartX < 30 && dx > 60 && window.innerWidth <= 768) openSidebar();
+        }, { passive: true });
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) closeSidebar();
+        });
+    })();
+    /* ═══════════════════════════════════ */
+    </script>
+<script>
+function toggleSidebarNew(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlayNew').classList.toggle('show');
+}
+</script>
+</body>
+</html>

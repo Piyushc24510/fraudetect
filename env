@@ -1,0 +1,31 @@
+# Flask Configuration
+FLASK_APP=app.py
+FLASK_ENV=development
+FLASK_DEBUG=True
+SECRET_KEY=your-secret-key-change-this-in-production
+
+# Server Configuration
+HOST=0.0.0.0
+PORT=5000
+
+# Admin Credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+
+# Database
+DATABASE_PATH=fraud_detection.db
+
+# Model Files
+MODEL_PATH=model.pkl
+VECTORIZER_PATH=vectorizer.pkl
+
+# Email Notifications (optional)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-email-password
+
+# Security
+SESSION_COOKIE_SECURE=False
+SESSION_COOKIE_HTTPONLY=True

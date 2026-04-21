@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+
+        :root {
+            --sidebar-w: 260px;
+        }
+        :root[data-theme="light"] {
+            --bg:#ffffff;--card:#f6f8fa;--border:#d0d7de;--accent:#00884d;
+            --accent2:#006637;--text:#24292f;--muted:#57606a;
+            --fake:#d93025;--genuine:#137333;
+        }
+        :root[data-theme="dark"]{--bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#00ff99;--accent2:#00cc7a;--text:#e6edf3;--muted:#8b949e;--fake:#ff5555;--genuine:#00ff99;}
+        /* Light mode sidebar overrides */
+        [data-theme="light"] .sidebar{background:#f6f8fa;border-right:1px solid #d0d7de;}
+        [data-theme="light"] .logo-area h3{color:#00884d;}
+        [data-theme="light"] .logo-area .icon{color:#00884d;}
+        [data-theme="light"] .theme-toggle{background:rgba(0,136,77,0.08);border-color:#00884d;color:#00884d;}
+        [data-theme="light"] .theme-toggle:hover{background:rgba(0,136,77,0.15);}
+        [data-theme="light"] .nav-link{color:#57606a;}
+        [data-theme="light"] .nav-link:hover{background:rgba(0,136,77,0.09);color:#00884d;}
+        [data-theme="light"] .nav-link.active{background:rgba(0,136,77,0.12);color:#00884d;}
+        [data-theme="light"] .user-card{background:rgba(0,136,77,0.06);border-color:rgba(0,136,77,0.2);}
+        [data-theme="light"] .role-pill{background:rgba(0,136,77,0.12);color:#00884d;}
+        [data-theme="light"] .logout-btn{color:#d93025;}
+        [data-theme="light"] .logout-btn:hover{background:rgba(217,48,37,0.08);}
+        [data-theme="light"] .divider{background:#d0d7de;}
+        /* Light mode main content */
+        [data-theme="light"] .scard{background:#f6f8fa;border-color:#d0d7de;}
+        [data-theme="light"] .table-card{background:#f6f8fa;border-color:#d0d7de;}
+        [data-theme="light"] thead th{color:#57606a;border-bottom-color:#d0d7de;}
+        [data-theme="light"] tbody td{border-bottom-color:#e8ecef;}
+        [data-theme="light"] tbody tr:hover td{background:rgba(0,0,0,0.02);}
+        [data-theme="light"] .badge.fake{background:rgba(217,48,37,0.1);color:#d93025;}
+        [data-theme="light"] .badge.genuine{background:rgba(0,136,77,0.1);color:#00884d;}
+        [data-theme="light"] .conf-high{color:#00884d;}
+        [data-theme="light"] .clear-btn{background:rgba(217,48,37,0.08);border-color:rgba(217,48,37,0.25);color:#d93025;}
+        [data-theme="light"] .clear-btn:hover{background:rgba(217,48,37,0.15);}
+        [data-theme="light"] .mob-menu{background:#00884d;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+        .logo-area{text-align:center;margin-bottom:28px;}
+        .logo-area .icon{font-size:38px;color:var(--accent);}
+        .logo-area h3{font-size:16px;color:var(--accent);margin-top:8px;letter-spacing:1px;}
+        .logo-area small{font-size:11px;color:var(--muted);}
+        .theme-toggle{width:100%;padding:10px;background:rgba(0,255,153,0.08);border:1px solid var(--accent);color:var(--accent);border-radius:8px;cursor:pointer;margin-bottom:15px;font-size:13px;transition:all 0.2s;}
+        .theme-toggle:hover{background:rgba(0,255,153,0.15);}
+
+        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
+        .nav-link i{width:17px;text-align:center;}
+        .nav-link:hover{background:rgba(0,255,153,0.09);color:var(--accent);}
+        .nav-link.active{background:rgba(0,255,153,0.14);color:var(--accent);font-weight:600;}
+        .divider{height:1px;background:var(--border);margin:10px 0;}
+        .bottom-area{margin-top:auto;}
+        .user-card{background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.18);border-radius:10px;padding:13px;margin-bottom:10px;}
+        .user-card .uname{font-size:13px;font-weight:600;}
+        .user-card .uname i{color:var(--accent);margin-right:6px;}
+        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:var(--accent);margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
+        .logout-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
+        .logout-btn:hover{background:rgba(255,85,85,0.1);}
+        .main{margin-left:var(--sidebar-w);padding:32px 28px;}
+        .page-head{margin-bottom:26px;}
+        .page-head h1{font-size:26px;font-weight:700;}
+        .page-head p{color:var(--muted);font-size:14px;margin-top:5px;}
+        /* Stats row */
+        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:26px;}
+        .scard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:22px;display:flex;align-items:center;gap:16px;}
+        .scard-icon{width:50px;height:50px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+        .scard-icon.blue{background:rgba(77,156,255,0.15);color:#4d9cff;}
+        .scard-icon.red{background:rgba(255,85,85,0.15);color:var(--fake);}
+        .scard-icon.green{background:rgba(0,255,153,0.15);color:var(--accent);}
+        .scard-val{font-size:30px;font-weight:700;line-height:1;}
+        .scard-lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+        /* Table card */
+        .table-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:24px;overflow-x:auto;}
+        .card-hd{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:9px;}
+        .card-hd i{color:var(--accent);}
+        .card-hd-left{display:flex;align-items:center;gap:9px;}
+        table{width:100%;border-collapse:collapse;}
+        thead th{text-align:left;padding:9px 13px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);}
+        tbody td{padding:12px 13px;font-size:13px;border-bottom:1px solid rgba(48,54,61,0.5);vertical-align:middle;}
+        tbody tr:last-child td{border-bottom:none;}
+        tbody tr:hover td{background:rgba(255,255,255,0.02);}
+        .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+        .badge.fake{background:rgba(255,85,85,0.15);color:var(--fake);}
+        .badge.genuine{background:rgba(0,255,153,0.15);color:var(--accent);}
+        .rev-text{max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;color:var(--muted);}
+        .conf-high{color:var(--accent);font-weight:600;}
+        .conf-med{color:#ffaa00;font-weight:600;}
+        .clear-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,85,85,0.1);border:1px solid rgba(255,85,85,0.3);color:var(--fake);border-radius:8px;text-decoration:none;font-size:13px;transition:background 0.2s;}
+        .clear-btn:hover{background:rgba(255,85,85,0.2);}
+        .empty{text-align:center;padding:50px 20px;color:var(--muted);}
+        .empty i{font-size:48px;color:var(--border);display:block;margin-bottom:16px;}
+        .empty h4{font-size:16px;color:var(--text);margin-bottom:8px;}
+        .cta-btn{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#000;text-decoration:none;border-radius:9px;font-weight:700;font-size:14px;margin-top:16px;transition:transform 0.2s,box-shadow 0.2s;}
+        .cta-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,255,153,0.38);}
+        .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:190;}
+        .overlay.show{display:block;}
+        @media(max-width:860px){.sidebar{transform:translateX(-100%);transition:transform 0.3s;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;padding:20px 16px;padding-top:60px;}.mob-menu{display:flex!important;}.stats-row{grid-template-columns:1fr 1fr;}}
+        @media(max-width:480px){.stats-row{grid-template-columns:1fr;}.main{padding:14px;padding-top:60px;}}
+    </style>
+</head>
+<body>
+<button class="mob-menu" id="menuBtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+        <i class="fa fa-shield-alt icon"></i>
+        <h3>FraudDetect</h3>
+        <small>Review Analysis System</small>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fa fa-moon" id="themeIcon"></i>
+        <span id="themeText">Dark Mode</span>
+    </button>
+    {% if user_role == 'admin' %}
+    <a href="/dashboard" class="nav-link"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+    {% else %}
+    <a href="/user-dashboard" class="nav-link"><i class="fa fa-tachometer-alt"></i> My Dashboard</a>
+    {% endif %}
+    <a href="/check" class="nav-link"><i class="fa fa-search"></i> Check Review</a>
+    <a href="/history" class="nav-link active"><i class="fa fa-history"></i> History</a>
+    {% if user_role == 'admin' %}
+    <a href="/analytics" class="nav-link"><i class="fa fa-chart-line"></i> Analytics</a>
+    {% if user_role == 'admin' %}
+    <a href="/users" class="nav-link"><i class="fa fa-users"></i> User Management</a>
+    {% endif %}
+    {% endif %}
+    <div class="divider"></div>
+    <div class="bottom-area">
+        <div class="user-card">
+            <div class="uname"><i class="fa fa-user-circle"></i>{{ user_name if user_name else "User" }}</div>
+            <span class="role-pill">{{ user_role if user_role else "user" }}</span>
+        </div>
+        <a href="/logout" class="logout-btn"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-head">
+        <h1><i class="fa fa-history" style="color:var(--accent);margin-right:10px;"></i>{% if user_role == 'admin' %}Review History (All Users){% else %}My Review History{% endif %}</h1>
+        <p>{% if user_role == 'admin' %}All reviews analyzed across all users.{% else %}Reviews you have analyzed.{% endif %}</p>
+    </div>
+
+    {% if history %}
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="scard">
+            <div class="scard-icon blue"><i class="fa fa-clipboard-list"></i></div>
+            <div><div class="scard-val" style="color:#4d9cff;">{{ history|length }}</div><div class="scard-lbl">Total Reviews</div></div>
+        </div>
+        <div class="scard">
+            <div class="scard-icon red"><i class="fa fa-exclamation-triangle"></i></div>
+            <div><div class="scard-val" style="color:var(--fake);">{{ history|selectattr('is_fake','equalto',true)|list|length }}</div><div class="scard-lbl">Fake Detected</div></div>
+        </div>
+        <div class="scard">
+            <div class="scard-icon green"><i class="fa fa-check-circle"></i></div>
+            <div><div class="scard-val" style="color:var(--accent);">{{ history|rejectattr('is_fake','equalto',true)|list|length }}</div><div class="scard-lbl">Genuine Found</div></div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+        <div class="card-hd">
+            <div class="card-hd-left"><i class="fa fa-list"></i> Review Log</div>
+            {% if user_role == 'admin' %}
+            <form method="POST" action="/clear-history" style="display:inline;" onsubmit="return confirm('Clear all history? This cannot be undone.')">
+                <button type="submit" class="clear-btn"><i class="fa fa-trash"></i> Clear All</button>
+            </form>
+            {% endif %}
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Review</th>
+                    <th>Result</th>
+                    <th>Confidence</th>
+                    {% if user_role == 'admin' %}<th>Checked By</th>{% endif %}
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history %}
+                <tr>
+                    <td><span class="rev-text" title="{{ item.get('review_full', item.get('review','')) }}">{{ item.get('review_full', item.get('review','')) }}</span></td>
+                    <td>
+                        {% if item.get('is_fake') %}
+                        <span class="badge fake"><i class="fa fa-times-circle"></i> Fake</span>
+                        {% else %}
+                        <span class="badge genuine"><i class="fa fa-check-circle"></i> Genuine</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% set conf = item.get('confidence', 0) %}
+                        <span class="{{ 'conf-high' if conf >= 75 else 'conf-med' }}">{{ conf }}%</span>
+                    </td>
+                    {% if user_role == 'admin' %}<td style="color:var(--muted);font-size:12px;">{{ item.get('checked_by','') }}</td>{% endif %}
+                    <td style="color:var(--muted);font-size:12px;">{{ item.get('timestamp','') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="table-card">
+        <div class="empty">
+            <i class="fa fa-inbox"></i>
+            <h4>No reviews yet</h4>
+            <p>Start analyzing reviews to see your history here.</p>
+            <a href="/check" class="cta-btn"><i class="fa fa-search"></i> Check a Review</a>
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+</script>
+
+<script>
+(function(){var s=localStorage.getItem('appTheme')||'dark';document.documentElement.setAttribute('data-theme',s);})();
+function updateTheme(theme){var icon=document.getElementById('themeIcon');var text=document.getElementById('themeText');if(!icon||!text)return;if(theme==='dark'){icon.className='fa fa-sun';text.textContent='Light Mode';}else{icon.className='fa fa-moon';text.textContent='Dark Mode';}}
+function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme')||'dark';var next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('appTheme',next);updateTheme(next);}
+document.addEventListener('DOMContentLoaded',function(){updateTheme(localStorage.getItem('appTheme')||'dark');});
+</script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root[data-theme="dark"]  { --bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#00ff99;--accent2:#00cc7a;--text:#e6edf3;--muted:#8b949e;--fake:#ff5555;--genuine:#00ff99;--sidebar-w:260px;--input-bg:#0d1117; }
+        :root[data-theme="light"] { --bg:#ffffff;--card:#f6f8fa;--border:#d0d7de;--accent:#00884d;--accent2:#006637;--text:#24292f;--muted:#57606a;--fake:#d93025;--genuine:#137333;--sidebar-w:260px;--input-bg:#ffffff; }
+
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.3s,color 0.3s;}
+
+        /* ── Sidebar ── */
+        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;transition:transform 0.3s;}
+        .logo-area{text-align:center;margin-bottom:28px;}
+        .logo-area .icon{font-size:38px;color:var(--accent);}
+        .logo-area h3{font-size:16px;color:var(--accent);margin-top:8px;letter-spacing:1px;}
+        .logo-area small{font-size:11px;color:var(--muted);}
+        .theme-toggle{width:100%;padding:10px;background:rgba(0,255,153,0.08);border:1px solid var(--accent);color:var(--accent);border-radius:8px;cursor:pointer;margin-bottom:15px;font-size:13px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+        .theme-toggle:hover{background:rgba(0,255,153,0.15);}
+        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
+        .nav-link i{width:17px;text-align:center;}
+        .nav-link:hover{background:rgba(0,255,153,0.09);color:var(--accent);}
+        .nav-link.active{background:rgba(0,255,153,0.14);color:var(--accent);font-weight:600;}
+        .divider{height:1px;background:var(--border);margin:10px 0;}
+        .bottom-area{margin-top:auto;}
+        .user-card{background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.18);border-radius:10px;padding:13px;margin-bottom:10px;}
+        .user-card .uname{font-size:13px;font-weight:600;}
+        .user-card .uname i{color:var(--accent);margin-right:6px;}
+        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:var(--accent);margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
+        .logout-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
+        .logout-btn:hover{background:rgba(255,85,85,0.1);}
+
+        /* ── Main ── */
+        .main{margin-left:var(--sidebar-w);padding:32px 28px;}
+        .page-head{margin-bottom:26px;}
+        .page-head h1{font-size:26px;font-weight:700;}
+        .page-head p{color:var(--muted);font-size:14px;margin-top:5px;}
+
+        /* ── Stats Row ── */
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+        .scard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px;display:flex;align-items:center;gap:14px;}
+        .scard-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+        .scard-icon.blue{background:rgba(77,156,255,0.15);color:#4d9cff;}
+        .scard-icon.green{background:rgba(0,255,153,0.15);color:var(--accent);}
+        .scard-icon.orange{background:rgba(255,160,0,0.15);color:#ffa000;}
+        .scard-icon.red{background:rgba(255,85,85,0.15);color:var(--fake);}
+        .scard-val{font-size:26px;font-weight:700;line-height:1;}
+        .scard-lbl{font-size:12px;color:var(--muted);margin-top:3px;}
+
+        /* ── Toolbar ── */
+        .toolbar{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+        .search-wrap{position:relative;flex:1;min-width:200px;}
+        .search-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;}
+        .search-wrap input{width:100%;padding:10px 12px 10px 38px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;transition:border 0.2s;}
+        .search-wrap input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,255,153,0.1);}
+        .search-wrap input::placeholder{color:var(--muted);}
+        .filter-select{padding:10px 14px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;}
+        .filter-select:focus{outline:none;border-color:var(--accent);}
+        .count-badge{font-size:13px;color:var(--muted);white-space:nowrap;}
+
+        /* ── Table ── */
+        .table-card{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;}
+        .table-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+        .table-head-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px;}
+        .table-head-title i{color:var(--accent);}
+        .tbl-wrap{overflow-x:auto;}
+        table{width:100%;border-collapse:collapse;}
+        thead th{text-align:left;padding:11px 16px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.1);white-space:nowrap;}
+        tbody td{padding:14px 16px;font-size:13px;border-bottom:1px solid rgba(48,54,61,0.4);vertical-align:middle;}
+        tbody tr:last-child td{border-bottom:none;}
+        tbody tr:hover td{background:rgba(0,255,153,0.02);}
+        .empty{text-align:center;padding:60px 20px;color:var(--muted);}
+        .empty i{font-size:42px;color:var(--border);display:block;margin-bottom:14px;}
+
+        /* ── Badges ── */
+        .badge-role{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
+        .badge-role.admin{background:rgba(255,160,0,0.15);color:#ffa000;border:1px solid rgba(255,160,0,0.3);}
+        .badge-role.user{background:rgba(0,255,153,0.12);color:var(--accent);border:1px solid rgba(0,255,153,0.25);}
+        .badge-you{display:inline-block;font-size:10px;padding:1px 7px;border-radius:20px;background:rgba(77,156,255,0.15);color:#4d9cff;border:1px solid rgba(77,156,255,0.3);margin-left:6px;vertical-align:middle;}
+        .review-count{font-weight:600;}
+        .review-count.has-reviews{color:var(--accent);}
+        .review-count.no-reviews{color:var(--muted);}
+
+        /* ── Action Buttons ── */
+        .actions{display:flex;gap:8px;align-items:center;}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit;text-decoration:none;}
+        .btn-promote{background:rgba(255,160,0,0.12);color:#ffa000;border:1px solid rgba(255,160,0,0.3);}
+        .btn-promote:hover{background:rgba(255,160,0,0.22);}
+        .btn-demote{background:rgba(0,255,153,0.1);color:var(--accent);border:1px solid rgba(0,255,153,0.25);}
+        .btn-demote:hover{background:rgba(0,255,153,0.2);}
+        .btn-delete{background:rgba(255,85,85,0.1);color:var(--fake);border:1px solid rgba(255,85,85,0.25);}
+        .btn-delete:hover{background:rgba(255,85,85,0.2);}
+        .btn-disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+
+        /* ── Avatar ── */
+        .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;flex-shrink:0;}
+        .avatar.admin-av{background:linear-gradient(135deg,#ffa000,#ff6f00);}
+        .user-info-cell{display:flex;align-items:center;gap:11px;}
+        .user-info-cell .uname{font-weight:600;font-size:13px;}
+        .user-info-cell .fullname{font-size:11px;color:var(--muted);margin-top:2px;}
+
+        /* ── Confirm Modal ── */
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+        .modal-overlay.show{display:flex;}
+        .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:popIn 0.2s ease;}
+        @keyframes popIn{from{transform:scale(0.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+        .modal-icon{font-size:42px;text-align:center;margin-bottom:16px;}
+        .modal h3{text-align:center;font-size:18px;margin-bottom:8px;}
+        .modal p{text-align:center;color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:24px;}
+        .modal-actions{display:flex;gap:10px;}
+        .modal-actions .btn{flex:1;justify-content:center;padding:11px;}
+
+        /* ── Mobile ── */
+        .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:190;}
+        .overlay.show{display:block;}
+        @media(max-width:860px){
+            .sidebar{transform:translateX(-100%);}
+            .sidebar.open{transform:translateX(0);}
+            .main{margin-left:0;padding:20px 16px;padding-top:60px;}
+            .mob-menu{display:flex!important;}
+            .stats-row{grid-template-columns:1fr 1fr;}
+            .toolbar{flex-direction:column;align-items:stretch;}
+        }
+        @media(max-width:480px){.stats-row{grid-template-columns:1fr;}.main{padding:14px;padding-top:60px;}}
+    </style>
+</head>
+<body>
+
+<button class="mob-menu" id="menuBtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+        <i class="fa fa-shield-alt icon"></i>
+        <h3>FraudDetect</h3>
+        <small>Review Analysis System</small>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fa fa-moon" id="themeIcon"></i>
+        <span id="themeText">Dark Mode</span>
+    </button>
+    <a href="/dashboard" class="nav-link"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/check"     class="nav-link"><i class="fa fa-search"></i> Check Review</a>
+    <a href="/history"   class="nav-link"><i class="fa fa-history"></i> History</a>
+    {% if user_role == 'admin' %}
+    <a href="/analytics" class="nav-link"><i class="fa fa-chart-line"></i> Analytics</a>
+    <a href="/users"     class="nav-link active"><i class="fa fa-users"></i> User Management</a>
+    {% endif %}
+    <div class="divider"></div>
+    <div class="bottom-area">
+        <div class="user-card">
+            <div class="uname"><i class="fa fa-user-circle"></i>{{ user_name if user_name else "Admin" }}</div>
+            <span class="role-pill">{{ user_role if user_role else "admin" }}</span>
+        </div>
+        <a href="/logout" class="logout-btn"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </div>
+</aside>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-icon">🗑️</div>
+        <h3>Delete User?</h3>
+        <p id="deleteModalMsg">This will permanently delete the user and cannot be undone.</p>
+        <div class="modal-actions">
+            <button class="btn" style="background:var(--border);color:var(--text);border:none;" onclick="closeModal()">
+                <i class="fa fa-times"></i> Cancel
+            </button>
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="btn btn-delete" style="width:100%;justify-content:center;padding:11px;">
+                    <i class="fa fa-trash"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<main class="main">
+    <div class="page-head">
+        <h1><i class="fa fa-users" style="color:var(--accent);margin-right:10px;"></i>User Management</h1>
+        <p>Manage all registered users — view, promote, demote, or remove accounts.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="scard">
+            <div class="scard-icon blue"><i class="fa fa-users"></i></div>
+            <div>
+                <div class="scard-val" style="color:#4d9cff;">{{ users|length }}</div>
+                <div class="scard-lbl">Total Users</div>
+            </div>
+        </div>
+        <div class="scard">
+            <div class="scard-icon orange"><i class="fa fa-user-shield"></i></div>
+            <div>
+                <div class="scard-val" style="color:#ffa000;">{{ users|selectattr('role','equalto','admin')|list|length }}</div>
+                <div class="scard-lbl">Admins</div>
+            </div>
+        </div>
+        <div class="scard">
+            <div class="scard-icon green"><i class="fa fa-user"></i></div>
+            <div>
+                <div class="scard-val" style="color:var(--accent);">{{ users|selectattr('role','equalto','user')|list|length }}</div>
+                <div class="scard-lbl">Regular Users</div>
+            </div>
+        </div>
+        <div class="scard">
+            <div class="scard-icon red"><i class="fa fa-chart-bar"></i></div>
+            <div>
+                <div class="scard-val" style="color:var(--fake);">{{ users|sum(attribute='review_count') }}</div>
+                <div class="scard-lbl">Total Reviews</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search + Filter Toolbar -->
+    <div class="toolbar">
+        <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by name or username..." oninput="filterTable()">
+        </div>
+        <select class="filter-select" id="roleFilter" onchange="filterTable()">
+            <option value="">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+        </select>
+        <span class="count-badge" id="countBadge">{{ users|length }} users</span>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-card">
+        <div class="table-head">
+            <div class="table-head-title"><i class="fa fa-list"></i> All Users</div>
+        </div>
+        <div class="tbl-wrap">
+            {% if users %}
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Reviews</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for u in users %}
+                <tr class="user-row" data-name="{{ u.name|lower }}" data-username="{{ u.username|lower }}" data-role="{{ u.role }}">
+                    <td style="color:var(--muted);font-size:12px;">{{ loop.index }}</td>
+                    <td>
+                        <div class="user-info-cell">
+                            <div class="avatar {% if u.role == 'admin' %}admin-av{% endif %}">
+                                {{ u.name[0]|upper if u.name else '?' }}
+                            </div>
+                            <div>
+                                <div class="uname">
+                                    {{ u.username }}
+                                    {% if u.username == current_user %}
+                                    <span class="badge-you">You</span>
+                                    {% endif %}
+                                </div>
+                                <div class="fullname">{{ u.name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-role {{ u.role }}">
+                            <i class="fa fa-{% if u.role == 'admin' %}crown{% else %}user{% endif %}"></i>
+                            {{ u.role|capitalize }}
+                        </span>
+                    </td>
+                    <td style="color:var(--muted);font-size:12px;white-space:nowrap;">
+                        <i class="fa fa-calendar" style="margin-right:5px;"></i>{{ u.joined }}
+                    </td>
+                    <td>
+                        <span class="review-count {% if u.review_count > 0 %}has-reviews{% else %}no-reviews{% endif %}">
+                            {{ u.review_count }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            {% if u.username != current_user %}
+                                <!-- Role Toggle -->
+                                {% if u.role == 'user' %}
+                                <form method="POST" action="/users/role/{{ u.id }}">
+                                    <input type="hidden" name="role" value="admin">
+                                    <button type="submit" class="btn btn-promote" title="Promote to Admin">
+                                        <i class="fa fa-arrow-up"></i> Promote
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form method="POST" action="/users/role/{{ u.id }}">
+                                    <input type="hidden" name="role" value="user">
+                                    <button type="submit" class="btn btn-demote" title="Demote to User">
+                                        <i class="fa fa-arrow-down"></i> Demote
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <!-- Delete -->
+                                <button class="btn btn-delete"
+                                    data-id="{{ u.id }}"
+                                    data-username="{{ u.username }}"
+                                    onclick="confirmDelete(this.dataset.id, this.dataset.username)">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            {% else %}
+                                <span style="font-size:12px;color:var(--muted);font-style:italic;">
+                                    <i class="fa fa-lock" style="margin-right:4px;"></i>Current account
+                                </span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div id="noResults" style="display:none;" class="empty">
+                <i class="fa fa-search"></i>
+                <p>No users match your search.</p>
+            </div>
+            {% else %}
+            <div class="empty">
+                <i class="fa fa-users"></i>
+                <p>No users registered yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<script>
+// Search + Filter
+function filterTable() {
+    var search = document.getElementById('searchInput').value.toLowerCase();
+    var role   = document.getElementById('roleFilter').value;
+    var rows   = document.querySelectorAll('.user-row');
+    var visible = 0;
+
+    rows.forEach(function(row) {
+        var name     = row.getAttribute('data-name') || '';
+        var username = row.getAttribute('data-username') || '';
+        var userRole = row.getAttribute('data-role') || '';
+
+        var matchSearch = name.includes(search) || username.includes(search);
+        var matchRole   = role === '' || userRole === role;
+
+        if (matchSearch && matchRole) {
+            row.style.display = '';
+            visible++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    document.getElementById('countBadge').textContent = visible + ' user' + (visible !== 1 ? 's' : '');
+    var noRes = document.getElementById('noResults');
+    if (noRes) noRes.style.display = (visible === 0) ? 'block' : 'none';
+}
+
+// Delete Modal
+function confirmDelete(userId, username) {
+    document.getElementById('deleteModalMsg').textContent =
+        'Delete "' + username + '"? This cannot be undone.';
+    document.getElementById('deleteForm').action = '/users/delete/' + userId;
+    document.getElementById('deleteModal').classList.add('show');
+}
+function closeModal() {
+    document.getElementById('deleteModal').classList.remove('show');
+}
+// Close modal on overlay click
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// Sidebar toggle
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+}
+
+// Theme
+(function(){
+    var s = localStorage.getItem('appTheme') || 'dark';
+    document.documentElement.setAttribute('data-theme', s);
+})();
+function updateTheme(theme) {
+    var icon = document.getElementById('themeIcon');
+    var text = document.getElementById('themeText');
+    if (!icon || !text) return;
+    if (theme === 'dark') { icon.className = 'fa fa-sun';  text.textContent = 'Light Mode'; }
+    else                  { icon.className = 'fa fa-moon'; text.textContent = 'Dark Mode';  }
+}
+function toggleTheme() {
+    var cur  = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('appTheme', next);
+    updateTheme(next);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    updateTheme(localStorage.getItem('appTheme') || 'dark');
+});
+</script>
+
+</body>
+</html>
