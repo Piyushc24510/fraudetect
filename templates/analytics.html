@@ -1,151 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-
         :root{
-    --bg:#0a0a0a;--card:#161b22;--border:#333333;
-    --accent:#00ff99;--accent2:#00cc7a;--text:#ffffff;
-    --muted:#888888;--fake:#ff5555;--genuine:#00ff99;
-    --sidebar-w:260px;
-}
+            --bg:#060910;--card:rgba(14,20,32,0.85);--border:rgba(0,255,180,0.12);
+            --accent:#00ffb3;--accent2:#00cc8a;--accent-glow:rgba(0,255,179,0.25);
+            --text:#e2edf7;--muted:#5a7a8a;--fake:#ff4466;--genuine:#00ffb3;
+            --sidebar-w:260px;--purple:#7c3aed;
+        }
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+        #three-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+        body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+        body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px);pointer-events:none;}
+
+        .sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:rgba(6,9,16,0.92);backdrop-filter:blur(24px);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
         .logo-area{text-align:center;margin-bottom:28px;}
-        .logo-area .icon{font-size:38px;color:var(--accent);}
-        .logo-area h3{font-size:16px;color:var(--accent);margin-top:8px;letter-spacing:1px;}
-        .logo-area small{font-size:11px;color:var(--muted);}
-        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
+        .logo-3d{width:64px;height:64px;margin:0 auto 12px;perspective:400px;cursor:pointer;}
+        .logo-cube{width:100%;height:100%;transform-style:preserve-3d;animation:rotateCube 8s linear infinite;position:relative;}
+        .logo-cube .face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid rgba(0,255,179,0.3);background:rgba(0,255,179,0.04);}
+        .logo-cube .front{transform:translateZ(32px);}.logo-cube .back{transform:rotateY(180deg) translateZ(32px);}.logo-cube .left{transform:rotateY(-90deg) translateZ(32px);}.logo-cube .right{transform:rotateY(90deg) translateZ(32px);}.logo-cube .top{transform:rotateX(90deg) translateZ(32px);}.logo-cube .bot{transform:rotateX(-90deg) translateZ(32px);}
+        @keyframes rotateCube{0%{transform:rotateX(0deg) rotateY(0deg);}100%{transform:rotateX(360deg) rotateY(360deg);}}
+        .logo-area h3{font-size:16px;color:var(--accent);letter-spacing:2px;font-weight:800;text-transform:uppercase;}
+        .logo-area small{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;}
+        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:13px;transition:all 0.2s;font-family:'Space Mono',monospace;position:relative;overflow:hidden;}
+        .nav-link::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent-glow);transition:width 0.2s;border-radius:0 4px 4px 0;}
+        .nav-link:hover::before,.nav-link.active::before{width:3px;}
         .nav-link i{width:17px;text-align:center;}
-        .nav-link:hover{background:rgba(0,255,153,0.09);color:var(--accent);}
-        .nav-link.active{background:rgba(0,255,153,0.14);color:var(--accent);font-weight:600;}
+        .nav-link:hover{background:rgba(0,255,179,0.07);color:var(--accent);}
+        .nav-link.active{background:rgba(0,255,179,0.1);color:var(--accent);font-weight:700;}
         .divider{height:1px;background:var(--border);margin:10px 0;}
         .bottom-area{margin-top:auto;}
-        .user-card{background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.18);border-radius:10px;padding:13px;margin-bottom:10px;}
-        .user-card .uname{font-size:13px;font-weight:600;}
+        .user-card{background:rgba(0,255,179,0.04);border:1px solid rgba(0,255,179,0.15);border-radius:10px;padding:13px;margin-bottom:10px;}
+        .user-card .uname{font-size:13px;font-weight:700;font-family:'Space Mono',monospace;}
         .user-card .uname i{color:var(--accent);margin-right:6px;}
-        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:var(--accent);margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
-        .logout-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
-        .logout-btn:hover{background:rgba(255,85,85,0.1);}
-        .main{position:relative;z-index:1;margin-left:var(--sidebar-w);padding:32px 28px;}
-        .page-head{margin-bottom:26px;}
-        .page-head h1{font-size:26px;font-weight:700;}
-        .page-head p{color:var(--muted);font-size:14px;margin-top:5px;}
-        .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
-        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:190;}
-        .overlay.show{display:block;}
-        @media(max-width:860px){.sidebar{transform:translateX(-100%);transition:transform 0.3s;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;padding:20px 16px;padding-top:60px;}.mob-menu{display:flex!important;}}
-        @media(max-width:480px){.main{padding:14px;padding-top:60px;}}
-        /* ── page specific ── */
-        :root{--bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#00ff99;--accent2:#00cc7a;--text:#e6edf3;--muted:#8b949e;--fake:#ff5555;--genuine:#00ff99;}
-        
+        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,179,0.12);color:var(--accent);margin-top:5px;text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace;}
+        .logout-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:var(--fake);text-decoration:none;font-size:13px;transition:background 0.18s;font-family:'Space Mono',monospace;}
+        .logout-btn:hover{background:rgba(255,68,102,0.1);}
 
+        .main{margin-left:var(--sidebar-w);padding:36px 32px;position:relative;z-index:10;}
+        .page-head{margin-bottom:30px;}
+        .page-head h1{font-size:30px;font-weight:800;background:linear-gradient(135deg,var(--accent),#00a8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .page-head h1 i{margin-right:10px;}
+        .page-head p{color:var(--muted);font-size:13px;margin-top:6px;font-family:'Space Mono',monospace;}
 
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-        .sidebar{position:fixed;z-index:200;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--card);border-right:1px solid var(--border);padding:28px 18px;z-index:200;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
-        .logo-area{text-align:center;margin-bottom:28px;}
-        .logo-area .icon{font-size:38px;color:var(--accent);}
-        .logo-area h3{font-size:16px;color:var(--accent);margin-top:8px;letter-spacing:1px;}
-        .logo-area small{font-size:11px;color:var(--muted);}
-
-
-        .nav-link{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:14px;transition:background 0.18s,color 0.18s;}
-        .nav-link i{width:17px;text-align:center;}
-        .nav-link:hover{background:rgba(0,255,153,0.09);color:var(--accent);}
-        .nav-link.active{background:rgba(0,255,153,0.14);color:var(--accent);font-weight:600;}
-        .divider{height:1px;background:var(--border);margin:10px 0;}
-        .bottom-area{margin-top:auto;}
-        .user-card{background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.18);border-radius:10px;padding:13px;margin-bottom:10px;}
-        .user-card .uname{font-size:13px;font-weight:600;}
-        .user-card .uname i{color:var(--accent);margin-right:6px;}
-        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,255,153,0.15);color:var(--accent);margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
-        .logout-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;color:#ff5555;text-decoration:none;font-size:13px;transition:background 0.18s;}
-        .logout-btn:hover{background:rgba(255,85,85,0.1);}
-        .main{position:relative;z-index:1;margin-left:var(--sidebar-w);padding:32px 28px;}
-        .page-head{margin-bottom:26px;}
-        .page-head h1{font-size:26px;font-weight:700;}
-        .page-head p{color:var(--muted);font-size:14px;margin-top:5px;}
-        /* Date filter */
-        .filter-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:22px;margin-bottom:24px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;}
-        .filter-group{display:flex;flex-direction:column;gap:6px;}
-        .filter-group label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
-        .filter-group input[type="date"]{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;font-family:inherit;}
-        .filter-group input[type="date"]:focus{outline:none;border-color:var(--accent);}
-        .quick-btns{display:flex;gap:8px;flex-wrap:wrap;}
-        .quick-btn{padding:8px 14px;background:rgba(0,255,153,0.08);border:1px solid rgba(0,255,153,0.2);color:var(--accent);border-radius:7px;font-size:12px;cursor:pointer;transition:background 0.2s;}
-        .quick-btn:hover{background:rgba(0,255,153,0.18);}
-        .apply-btn{padding:9px 20px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;transition:transform 0.2s;}
-        .apply-btn:hover{transform:translateY(-1px);}
-        /* Stats row */
-        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:26px;}
-        .scard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:22px;display:flex;align-items:center;gap:16px;}
-        .scard-icon{width:50px;height:50px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-        .scard-icon.blue{background:rgba(77,156,255,0.15);color:#4d9cff;}
-        .scard-icon.red{background:rgba(255,85,85,0.15);color:var(--fake);}
-        .scard-icon.green{background:rgba(0,255,153,0.15);color:var(--accent);}
-        .scard-val{font-size:30px;font-weight:700;line-height:1;}
-        .scard-lbl{font-size:12px;color:var(--muted);margin-top:4px;}
-        /* Table */
-        .table-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:24px;margin-bottom:24px;overflow-x:auto;}
-        .card-hd{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:9px;}
+        /* Filter Card */
+        .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:24px;backdrop-filter:blur(20px);box-shadow:0 8px 40px rgba(0,0,0,0.5);transition:border-color 0.3s,box-shadow 0.3s;}
+        .card:hover{border-color:rgba(0,255,179,0.22);box-shadow:0 8px 50px rgba(0,255,179,0.08);}
+        .card-hd{font-size:13px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:9px;text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;}
         .card-hd i{color:var(--accent);}
+
+        .filter-wrap{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;}
+        .filter-group{display:flex;flex-direction:column;gap:6px;}
+        .filter-group label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace;}
+        .filter-group input[type="date"]{background:rgba(0,255,179,0.02);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;font-family:'Space Mono',monospace;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+        .filter-group input[type="date"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+        .quick-btns{display:flex;gap:7px;flex-wrap:wrap;}
+        .quick-btn{padding:8px 13px;background:rgba(0,255,179,0.04);border:1px solid var(--border);color:var(--accent);border-radius:7px;font-size:11px;font-family:'Space Mono',monospace;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;}
+        .quick-btn:hover{background:rgba(0,255,179,0.1);border-color:rgba(0,255,179,0.3);}
+        .apply-btn{padding:10px 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:8px;font-family:'Space Mono',monospace;font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
+        .apply-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,255,179,0.35);}
+
+        /* Stats */
+        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+        .scard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(20px);transition:transform 0.2s,border-color 0.3s,box-shadow 0.3s;position:relative;overflow:hidden;}
+        .scard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+        .scard.teal::before{background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+        .scard.red::before{background:linear-gradient(90deg,transparent,var(--fake),transparent);}
+        .scard.green::before{background:linear-gradient(90deg,transparent,#00ffb3,transparent);}
+        .scard:hover{transform:translateY(-3px);border-color:rgba(0,255,179,0.22);box-shadow:0 8px 50px rgba(0,255,179,0.08);}
+        .scard-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+        .scard-icon.teal{background:rgba(0,255,179,0.1);color:var(--accent);}
+        .scard-icon.red{background:rgba(255,68,102,0.12);color:var(--fake);}
+        .scard-icon.green{background:rgba(0,255,179,0.1);color:#00ffb3;}
+        .scard-val{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;line-height:1;}
+        .scard-val.teal{color:var(--accent);}.scard-val.red{color:var(--fake);}.scard-val.green{color:#00ffb3;}
+        .scard-lbl{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;font-family:'Space Mono',monospace;}
+
+        /* Tables */
         table{width:100%;border-collapse:collapse;}
-        thead th{text-align:left;padding:9px 13px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);}
-        tbody td{padding:12px 13px;font-size:13px;border-bottom:1px solid rgba(48,54,61,0.5);vertical-align:middle;}
+        thead th{text-align:left;padding:9px 13px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;}
+        tbody td{padding:12px 13px;font-size:13px;border-bottom:1px solid rgba(0,255,179,0.05);vertical-align:middle;}
         tbody tr:last-child td{border-bottom:none;}
-        tbody tr:hover td{background:rgba(255,255,255,0.02);}
-        .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
-        .badge.fake{background:rgba(255,85,85,0.15);color:var(--fake);}
-        .badge.genuine{background:rgba(0,255,153,0.15);color:var(--accent);}
+        tbody tr:hover td{background:rgba(0,255,179,0.03);}
+        .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;}
+        .badge.fake{background:rgba(255,68,102,0.1);color:var(--fake);border:1px solid rgba(255,68,102,0.25);}
+        .badge.genuine{background:rgba(0,255,179,0.08);color:var(--accent);border:1px solid rgba(0,255,179,0.2);}
         .rev-text{max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;color:var(--muted);}
-        .empty{text-align:center;padding:40px 20px;color:var(--muted);}
-        .empty i{font-size:40px;color:var(--border);display:block;margin-bottom:12px;}
+        .empty{text-align:center;padding:40px 20px;color:var(--muted);font-family:'Space Mono',monospace;}
+        .empty i{font-size:36px;color:rgba(0,255,179,0.1);display:block;margin-bottom:12px;}
+
         .mob-menu{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:8px;width:40px;height:40px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
-        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:190;}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:190;}
         .overlay.show{display:block;}
-        @media(max-width:860px){.sidebar{transform:translateX(-100%);transition:transform 0.3s;}.sidebar.open{transform:translateX(0);}.main{position:relative;z-index:1;margin-left:0;padding:20px 16px;padding-top:60px;}.mob-menu{display:flex!important;}.stats-row{grid-template-columns:1fr 1fr;}.filter-card{flex-direction:column;align-items:flex-start;}}
-        @media(max-width:480px){.stats-row{grid-template-columns:1fr;}.main{padding:14px;padding-top:60px;}}
+        @media(max-width:860px){.sidebar{transform:translateX(-100%);transition:transform 0.3s;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;padding:20px 16px;padding-top:64px;}.mob-menu{display:flex!important;}.stats-row{grid-template-columns:1fr 1fr;}.filter-wrap{flex-direction:column;align-items:flex-start;}}
+        @media(max-width:480px){.stats-row{grid-template-columns:1fr;}.main{padding:14px;padding-top:64px;}}
     </style>
 </head>
 <body>
+<canvas id="three-canvas"></canvas>
 <button class="mob-menu" id="menuBtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
 <aside class="sidebar" id="sidebar">
     <div class="logo-area">
-        <i class="fa fa-shield-alt icon"></i>
-        <h3>FraudDetect</h3>
-        <small>Review Analysis System</small>
+        <div class="logo-3d"><div class="logo-cube"><div class="face front">🛡️</div><div class="face back">🔍</div><div class="face left">⚡</div><div class="face right">🤖</div><div class="face top">🎯</div><div class="face bot">✅</div></div></div>
+        <h3>FraudDetect</h3><small>Review Analysis System</small>
     </div>
     <a href="/dashboard" class="nav-link"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
     <a href="/check" class="nav-link"><i class="fa fa-search"></i> Check Review</a>
@@ -156,75 +121,53 @@
     {% endif %}
     <div class="divider"></div>
     <div class="bottom-area">
-        <div class="user-card">
-            <div class="uname"><i class="fa fa-user-circle"></i>{{ user_name if user_name else "User" }}</div>
-            <span class="role-pill">{{ user_role if user_role else "user" }}</span>
-        </div>
+        <div class="user-card"><div class="uname"><i class="fa fa-user-circle"></i>{{ user_name if user_name else "User" }}</div><span class="role-pill">{{ user_role if user_role else "user" }}</span></div>
         <a href="/logout" class="logout-btn"><i class="fa fa-sign-out-alt"></i> Logout</a>
     </div>
 </aside>
 
 <main class="main">
     <div class="page-head">
-        <h1><i class="fa fa-chart-line" style="color:var(--accent);margin-right:10px;"></i>Analytics Dashboard</h1>
-        <p>Analyze fraud patterns with custom date ranges.</p>
+        <h1><i class="fa fa-chart-line"></i>Analytics Dashboard</h1>
+        <p>// Analyze fraud patterns with custom date ranges</p>
     </div>
 
-    <!-- Date Filter -->
-    <div class="filter-card">
-        <div class="filter-group">
-            <label>From</label>
-            <input type="date" id="startDate" value="{{ start_date }}">
-        </div>
-        <div class="filter-group">
-            <label>To</label>
-            <input type="date" id="endDate" value="{{ end_date }}">
-        </div>
-        <div class="filter-group">
-            <label>Quick Select</label>
-            <div class="quick-btns">
-                <button class="quick-btn" onclick="setRange(7)">Last 7 Days</button>
-                <button class="quick-btn" onclick="setRange(30)">Last 30 Days</button>
-                <button class="quick-btn" onclick="setRange(90)">Last 90 Days</button>
+    <div class="card">
+        <div class="card-hd"><i class="fa fa-filter"></i> Date Filter</div>
+        <div class="filter-wrap">
+            <div class="filter-group"><label>From</label><input type="date" id="startDate" value="{{ start_date }}"></div>
+            <div class="filter-group"><label>To</label><input type="date" id="endDate" value="{{ end_date }}"></div>
+            <div class="filter-group">
+                <label>Quick Select</label>
+                <div class="quick-btns">
+                    <button class="quick-btn" onclick="setRange(7)">Last 7 Days</button>
+                    <button class="quick-btn" onclick="setRange(30)">Last 30 Days</button>
+                    <button class="quick-btn" onclick="setRange(90)">Last 90 Days</button>
+                </div>
             </div>
+            <button class="apply-btn" onclick="applyFilter()"><i class="fa fa-bolt"></i> Apply</button>
         </div>
-        <button class="apply-btn" onclick="applyFilter()"><i class="fa fa-filter"></i> Apply</button>
     </div>
 
-    <!-- Stats -->
     <div class="stats-row">
-        <div class="scard">
-            <div class="scard-icon blue"><i class="fa fa-clipboard-list"></i></div>
-            <div><div class="scard-val" style="color:#4d9cff;">{{ total }}</div><div class="scard-lbl">Total Reviews</div></div>
-        </div>
-        <div class="scard">
-            <div class="scard-icon red"><i class="fa fa-exclamation-triangle"></i></div>
-            <div><div class="scard-val" style="color:var(--fake);">{{ fake }}</div><div class="scard-lbl">Fake Detected</div></div>
-        </div>
-        <div class="scard">
-            <div class="scard-icon green"><i class="fa fa-check-circle"></i></div>
-            <div><div class="scard-val" style="color:var(--accent);">{{ genuine }}</div><div class="scard-lbl">Genuine Found</div></div>
-        </div>
+        <div class="scard teal"><div class="scard-icon teal"><i class="fa fa-clipboard-list"></i></div><div><div class="scard-val teal">{{ total }}</div><div class="scard-lbl">Total Reviews</div></div></div>
+        <div class="scard red"><div class="scard-icon red"><i class="fa fa-triangle-exclamation"></i></div><div><div class="scard-val red">{{ fake }}</div><div class="scard-lbl">Fake Detected</div></div></div>
+        <div class="scard green"><div class="scard-icon green"><i class="fa fa-circle-check"></i></div><div><div class="scard-val green">{{ genuine }}</div><div class="scard-lbl">Genuine Found</div></div></div>
     </div>
 
-    <!-- User Activity Table -->
-    <div class="table-card">
+    <div class="card">
         <div class="card-hd"><i class="fa fa-users"></i> User Activity in Selected Period</div>
         {% if user_stats %}
         <table>
-            <thead>
-                <tr>
-                    <th>User</th><th>Total Checks</th><th>Fake Found</th><th>Genuine Found</th><th>Detection Rate</th>
-                </tr>
-            </thead>
+            <thead><tr><th>User</th><th>Total Checks</th><th>Fake Found</th><th>Genuine Found</th><th>Detection Rate</th></tr></thead>
             <tbody>
                 {% for user, stats in user_stats.items() %}
                 <tr>
                     <td><strong>{{ user }}</strong></td>
-                    <td>{{ stats.total }}</td>
-                    <td style="color:var(--fake);">{{ stats.fake }}</td>
-                    <td style="color:var(--accent);">{{ stats.genuine }}</td>
-                    <td>{{ "%.1f"|format((stats.fake / stats.total * 100) if stats.total > 0 else 0) }}%</td>
+                    <td style="font-family:'Space Mono',monospace;">{{ stats.total }}</td>
+                    <td style="color:var(--fake);font-weight:700;font-family:'Space Mono',monospace;">{{ stats.fake }}</td>
+                    <td style="color:var(--accent);font-weight:700;font-family:'Space Mono',monospace;">{{ stats.genuine }}</td>
+                    <td style="color:var(--accent);font-weight:700;font-family:'Space Mono',monospace;">{{ "%.1f"|format((stats.fake / stats.total * 100) if stats.total > 0 else 0) }}%</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -234,140 +177,36 @@
         {% endif %}
     </div>
 
-    <!-- Reviews Table -->
-    <div class="table-card">
-        <div class="card-hd"><i class="fa fa-list"></i> Reviews in Selected Period ({{ total }} total)</div>
+    <div class="card">
+        <div class="card-hd"><i class="fa fa-list-check"></i> Reviews in Selected Period ({{ total }} total)</div>
         {% if history %}
         <table>
-            <thead>
-                <tr><th>Time</th><th>Review</th><th>Result</th><th>Confidence</th><th>Checked By</th></tr>
-            </thead>
+            <thead><tr><th>Time</th><th>Review</th><th>Result</th><th>Confidence</th><th>Checked By</th></tr></thead>
             <tbody>
                 {% for item in history[:50] %}
                 <tr>
-                    <td style="color:var(--muted);font-size:12px;white-space:nowrap;">{{ item.timestamp }}</td>
+                    <td style="color:var(--muted);font-size:11px;white-space:nowrap;font-family:'Space Mono',monospace;">{{ item.timestamp }}</td>
                     <td><span class="rev-text" title="{{ item.review }}">{{ item.review }}</span></td>
-                    <td>
-                        {% if item.is_fake %}
-                        <span class="badge fake"><i class="fa fa-times-circle"></i> Fake</span>
-                        {% else %}
-                        <span class="badge genuine"><i class="fa fa-check-circle"></i> Genuine</span>
-                        {% endif %}
-                    </td>
-                    <td style="color:var(--accent);font-weight:600;">{{ item.confidence }}%</td>
-                    <td style="color:var(--muted);font-size:12px;">{{ item.checked_by }}</td>
+                    <td>{% if item.is_fake %}<span class="badge fake"><i class="fa fa-xmark"></i> Fake</span>{% else %}<span class="badge genuine"><i class="fa fa-check"></i> Genuine</span>{% endif %}</td>
+                    <td style="color:var(--accent);font-weight:700;font-family:'Space Mono',monospace;">{{ item.confidence }}%</td>
+                    <td style="color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;">{{ item.checked_by }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        {% if total > 50 %}
-        <p style="text-align:center;margin-top:16px;color:var(--muted);font-size:13px;">Showing first 50 of {{ total }} reviews</p>
-        {% endif %}
+        {% if total > 50 %}<p style="text-align:center;margin-top:16px;color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;">Showing first 50 of {{ total }} reviews</p>{% endif %}
         {% else %}
         <div class="empty"><i class="fa fa-inbox"></i><p>No reviews in this period.</p></div>
         {% endif %}
     </div>
 </main>
 
-<script>
-function setRange(days){
-    var end=new Date(),start=new Date();
-    start.setDate(start.getDate()-days);
-    document.getElementById('endDate').value=end.toISOString().split('T')[0];
-    document.getElementById('startDate').value=start.toISOString().split('T')[0];
-}
-function applyFilter(){
-    var s=document.getElementById('startDate').value;
-    var e=document.getElementById('endDate').value;
-    if(!s||!e){alert('Please select both dates');return;}
-    window.location.href='/analytics?start_date='+s+'&end_date='+e;
-}
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
-</script>
-
-<script>
-(function(){var s=localStorage.getItem('appTheme')||'dark';
-function updateTheme(theme){var icon=document.getElementById('themeIcon');var text=document.getElementById('themeText');if(!icon||!text)return;if(theme==='dark'){icon.className='fa fa-sun';text.textContent='Light Mode';}else{icon.className='fa fa-moon';text.textContent='Dark Mode';}}
-document.addEventListener('DOMContentLoaded',function(){updateTheme(localStorage.getItem('appTheme')||'dark');});
-})();
-</script>
-
-<!-- THREE.JS 3D AMBIENT BACKGROUND -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<canvas id="bg3d" style="position:fixed;top:0;left:260px;width:calc(100% - 260px);height:100%;z-index:0;pointer-events:none;opacity:0.6;"></canvas>
 <script>
-(function() {
-  var canvas = document.getElementById('bg3d');
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  var W = window.innerWidth - 260, H = window.innerHeight;
-  renderer.setSize(W, H);
-
-  var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 1000);
-  camera.position.z = 90;
-
-  var N = 120;
-  var pos = new Float32Array(N * 3);
-  var vel = [];
-  var npos = [];
-  for (var i = 0; i < N; i++) {
-    var x = (Math.random()-0.5)*180, y = (Math.random()-0.5)*140, z = (Math.random()-0.5)*60;
-    pos[i*3]=x; pos[i*3+1]=y; pos[i*3+2]=z;
-    npos.push(new THREE.Vector3(x,y,z));
-    vel.push(new THREE.Vector3((Math.random()-0.5)*0.06,(Math.random()-0.5)*0.06,(Math.random()-0.5)*0.03));
-  }
-  var pg = new THREE.BufferGeometry();
-  pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  var pm = new THREE.PointsMaterial({ color: 0x00ff99, size: 1.0, transparent: true, opacity: 0.5, sizeAttenuation: true });
-  scene.add(new THREE.Points(pg, pm));
-
-  var ML = 200, lp = new Float32Array(ML*6);
-  var lg = new THREE.BufferGeometry();
-  lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
-  var lm = new THREE.LineBasicMaterial({ color: 0x00ff99, transparent: true, opacity: 0.07 });
-  scene.add(new THREE.LineSegments(lg, lm));
-
-  window.addEventListener('resize', function() {
-    var nW = window.innerWidth - 260, nH = window.innerHeight;
-    camera.aspect = nW / nH; camera.updateProjectionMatrix();
-    renderer.setSize(nW, nH);
-  });
-
-  var t = 0;
-  function animate() {
-    requestAnimationFrame(animate);
-    t += 0.003;
-    for (var i = 0; i < N; i++) {
-      pos[i*3]   += vel[i].x;
-      pos[i*3+1] += vel[i].y;
-      pos[i*3+2] += vel[i].z;
-      if (Math.abs(pos[i*3])   > 90)  vel[i].x *= -1;
-      if (Math.abs(pos[i*3+1]) > 70)  vel[i].y *= -1;
-      if (Math.abs(pos[i*3+2]) > 30)  vel[i].z *= -1;
-      npos[i].set(pos[i*3], pos[i*3+1], pos[i*3+2]);
-    }
-    pg.attributes.position.needsUpdate = true;
-    var li = 0, MD = 28;
-    for (var a = 0; a < N && li < ML; a++) {
-      for (var b = a+1; b < N && li < ML; b++) {
-        if (npos[a].distanceTo(npos[b]) < MD) {
-          lp[li*6]=pos[a*3];lp[li*6+1]=pos[a*3+1];lp[li*6+2]=pos[a*3+2];
-          lp[li*6+3]=pos[b*3];lp[li*6+4]=pos[b*3+1];lp[li*6+5]=pos[b*3+2];
-          li++;
-        }
-      }
-    }
-    for (var k=li;k<ML;k++){lp[k*6]=lp[k*6+1]=lp[k*6+2]=lp[k*6+3]=lp[k*6+4]=lp[k*6+5]=0;}
-    lg.attributes.position.needsUpdate = true;
-    camera.position.x = Math.sin(t) * 5;
-    camera.position.y = Math.cos(t * 0.7) * 3;
-    camera.lookAt(scene.position);
-    renderer.render(scene, camera);
-  }
-  animate();
-})();
+function setRange(days){var end=new Date(),start=new Date();start.setDate(start.getDate()-days);document.getElementById('endDate').value=end.toISOString().split('T')[0];document.getElementById('startDate').value=start.toISOString().split('T')[0];}
+function applyFilter(){var s=document.getElementById('startDate').value,e=document.getElementById('endDate').value;if(!s||!e){alert('Please select both dates');return;}window.location.href='/analytics?start_date='+s+'&end_date='+e;}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+(function(){var canvas=document.getElementById('three-canvas'),renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));renderer.setSize(window.innerWidth,window.innerHeight);renderer.setClearColor(0x000000,0);var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,200);camera.position.z=40;var count=280,geo=new THREE.BufferGeometry(),positions=new Float32Array(count*3),colors=new Float32Array(count*3);for(var i=0;i<count;i++){positions[i*3]=(Math.random()-0.5)*120;positions[i*3+1]=(Math.random()-0.5)*80;positions[i*3+2]=(Math.random()-0.5)*60;var t=Math.random();if(t<0.6){colors[i*3]=0;colors[i*3+1]=0.8+Math.random()*0.2;colors[i*3+2]=0.5+Math.random()*0.5;}else{colors[i*3]=0.2+Math.random()*0.4;colors[i*3+1]=0.2+Math.random()*0.3;colors[i*3+2]=0.8+Math.random()*0.2;}}geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('color',new THREE.BufferAttribute(colors,3));var mat=new THREE.PointsMaterial({size:0.35,vertexColors:true,transparent:true,opacity:0.7,sizeAttenuation:true});scene.add(new THREE.Points(geo,mat));var cubes=[];for(var j=0;j<6;j++){var sz=3+Math.random()*5,cube=new THREE.Mesh(new THREE.BoxGeometry(sz,sz,sz),new THREE.MeshBasicMaterial({color:0x00ffb3,wireframe:true,transparent:true,opacity:0.08}));cube.position.set((Math.random()-0.5)*80,(Math.random()-0.5)*50,(Math.random()-0.5)*30);cube.userData={rx:(Math.random()-0.5)*0.01,ry:(Math.random()-0.5)*0.01,rz:(Math.random()-0.5)*0.005};scene.add(cube);cubes.push(cube);}for(var k=0;k<4;k++){var ico=new THREE.Mesh(new THREE.IcosahedronGeometry(2+Math.random()*3,0),new THREE.MeshBasicMaterial({color:0x6366f1,wireframe:true,transparent:true,opacity:0.07}));ico.position.set((Math.random()-0.5)*80,(Math.random()-0.5)*50,(Math.random()-0.5)*30);ico.userData={rx:(Math.random()-0.5)*0.012,ry:(Math.random()-0.5)*0.012};scene.add(ico);cubes.push(ico);}var mouse={x:0,y:0};document.addEventListener('mousemove',function(e){mouse.x=(e.clientX/window.innerWidth-0.5)*0.4;mouse.y=(e.clientY/window.innerHeight-0.5)*0.4;});var clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);var t=clock.getElapsedTime();scene.children[0].rotation.y=t*0.03;scene.children[0].rotation.x=Math.sin(t*0.015)*0.1;cubes.forEach(function(c){c.rotation.x+=c.userData.rx;c.rotation.y+=c.userData.ry;if(c.userData.rz)c.rotation.z+=c.userData.rz;});camera.position.x+=(mouse.x*8-camera.position.x)*0.03;camera.position.y+=(-mouse.y*5-camera.position.y)*0.03;camera.lookAt(scene.position);renderer.render(scene,camera);}animate();window.addEventListener('resize',function(){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});})();
 </script>
-
 </body>
 </html>
