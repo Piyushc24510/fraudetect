@@ -1,13 +1,11 @@
 services:
   - type: web
     name: fraudetect
-    env: python
+    runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn app:app
     envVars:
       - key: SECRET_KEY
-        value: your-random-secret-key
+        generateValue: true
       - key: DATABASE_PATH
         value: /opt/render/project/src/fraud_detection.db
-      - key: PYTHON_VERSION
-        value: 3.11.0
